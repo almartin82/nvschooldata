@@ -1,0 +1,47 @@
+#' nvschooldata: Fetch and Process Nevada School Data
+#'
+#' The nvschooldata package provides functions to download and process
+#' school data from the Nevada Department of Education (NDE).
+#'
+#' @section Main Functions:
+#' \itemize{
+#'   \item \code{\link{fetch_enr}}: Download enrollment data for a specific year
+#'   \item \code{\link{fetch_enr_range}}: Download enrollment data for multiple years
+#'   \item \code{\link{get_state_enrollment}}: Get statewide enrollment summary
+#' }
+#'
+#' @section Data Processing:
+#' \itemize{
+#'   \item \code{\link{tidy_enr}}: Convert wide data to tidy (long) format
+#'   \item \code{\link{id_enr_aggs}}: Add aggregation level flags
+#'   \item \code{\link{enr_grade_aggs}}: Create grade-level aggregates
+#' }
+#'
+#' @section Filtering:
+#' \itemize{
+#'   \item \code{\link{filter_district}}: Filter by district code
+#'   \item \code{\link{filter_county}}: Filter by county name
+#' }
+#'
+#' @section Cache Management:
+#' \itemize{
+#'   \item \code{\link{cache_status}}: Show cached data status
+#'   \item \code{\link{clear_enr_cache}}: Clear cached data
+#' }
+#'
+#' @section Data Source:
+#' Data is downloaded from the Nevada Department of Education website at
+#' \url{https://doe.nv.gov/offices/office-of-assessment-data-and-accountability-management-adam/accountability/data-requests/enrollment-for-nevada-public-schools}.
+#'
+#' Nevada uses several identifier systems:
+#' \itemize{
+#'   \item Local Education Agency (LEA) Code: District identifier
+#'   \item Master District Code: Alternative district identifier
+#'   \item School Code: School identifier within a district
+#' }
+#'
+#' @docType package
+#' @name nvschooldata-package
+#' @aliases nvschooldata
+#' @keywords internal
+"_PACKAGE"
