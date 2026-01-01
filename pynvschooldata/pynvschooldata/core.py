@@ -44,6 +44,8 @@ def fetch_enr(end_year: int) -> pd.DataFrame:
     pkg = _get_pkg()
     with localconverter(robjects.default_converter + pandas2ri.converter):
         r_df = pkg.fetch_enr(end_year)
+        if isinstance(r_df, pd.DataFrame):
+            return r_df
         return pandas2ri.rpy2py(r_df)
 
 
@@ -70,6 +72,8 @@ def fetch_enr_multi(end_years: list[int]) -> pd.DataFrame:
     with localconverter(robjects.default_converter + pandas2ri.converter):
         r_years = robjects.IntVector(end_years)
         r_df = pkg.fetch_enr_multi(r_years)
+        if isinstance(r_df, pd.DataFrame):
+            return r_df
         return pandas2ri.rpy2py(r_df)
 
 
@@ -97,6 +101,8 @@ def tidy_enr(df: pd.DataFrame) -> pd.DataFrame:
     with localconverter(robjects.default_converter + pandas2ri.converter):
         r_df = pandas2ri.py2rpy(df)
         r_result = pkg.tidy_enr(r_df)
+        if isinstance(r_result, pd.DataFrame):
+            return r_result
         return pandas2ri.rpy2py(r_result)
 
 
@@ -118,7 +124,27 @@ def get_available_years() -> dict:
     pkg = _get_pkg()
     with localconverter(robjects.default_converter + pandas2ri.converter):
         r_result = pkg.get_available_years()
-        return {
-            "min_year": int(r_result.rx2("min_year")[0]),
-            "max_year": int(r_result.rx2("max_year")[0]),
-        }
+        # Handle both dict-like (NamedList) and R vector (rx2) access
+        if isinstance(r_result, dict):
+            return {
+                "min_year": int(r_result["min_year"]),
+                "max_year": int(r_result["max_year"]),
+            }
+        elif hasattr(r_result, "rx2"):
+            return {
+                "min_year": int(r_result.rx2("min_year")[0]),
+                "max_year": int(r_result.rx2("max_year")[0]),
+            }
+        else:
+            # NamedList or similar - access by key, value may be a list
+            min_val = r_result["min_year"]
+            max_val = r_result["max_year"]
+            # Handle case where values are lists/arrays
+            if hasattr(min_val, "__getitem__") and not isinstance(min_val, (int, float)):
+                min_val = min_val[0]
+            if hasattr(max_val, "__getitem__") and not isinstance(max_val, (int, float)):
+                max_val = max_val[0]
+            return {
+                "min_year": int(min_val),
+                "max_year": int(max_val),
+            }
