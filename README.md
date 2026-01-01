@@ -1,8 +1,9 @@
 # nvschooldata
 
 [![R-CMD-check](https://github.com/almartin82/nvschooldata/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/almartin82/nvschooldata/actions/workflows/R-CMD-check.yaml)
+[![Python Tests](https://github.com/almartin82/nvschooldata/actions/workflows/python-test.yaml/badge.svg)](https://github.com/almartin82/nvschooldata/actions/workflows/python-test.yaml)
 
-Fetch and analyze Nevada public school enrollment data from the Nevada Department of Education.
+Fetch and analyze Nevada school enrollment data from [NVDOE](https://doe.nv.gov/offices/office-of-assessment-data-and-accountability-management-adam/accountability/data-requests/enrollment-for-nevada-public-schools) in R or Python.
 
 ## What can you find with nvschooldata?
 
@@ -218,6 +219,8 @@ remotes::install_github("almartin82/nvschooldata")
 
 ## Quick start
 
+### R
+
 ```r
 library(nvschooldata)
 library(dplyr)
@@ -246,6 +249,31 @@ enr_2026 %>%
 
 # Grade-level aggregates (K-8, 9-12)
 enr_grade_aggs(enr_2026)
+```
+
+### Python
+
+```python
+import pynvschooldata as nv
+
+# Check available years
+years = nv.get_available_years()
+print(f"Data available from {years['min_year']} to {years['max_year']}")
+
+# Fetch one year
+df = nv.fetch_enr(2026)
+
+# Fetch multiple years
+df_multi = nv.fetch_enr_multi([2024, 2025, 2026])
+
+# Filter to district totals
+district_totals = df[
+    (df['is_district'] == True) &
+    (df['grade_level'] == 'TOTAL') &
+    (df['subgroup'] == 'total_enrollment')
+].sort_values('n_students', ascending=False)
+
+print(district_totals[['district_name', 'n_students']])
 ```
 
 ## Data availability
