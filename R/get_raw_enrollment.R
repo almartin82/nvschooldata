@@ -8,7 +8,8 @@
 # Data is available from the NDE website at:
 # https://doe.nv.gov/offices/office-of-assessment-data-and-accountability-management-adam/accountability/data-requests/enrollment-for-nevada-public-schools
 #
-# Historical data is available from 2015-16 through the current year.
+# Historical data is available from 2015-16 through the current year,
+# though 2024-25 (end_year = 2025) is currently unavailable from NDE.
 # File formats vary by year:
 # - 2015-16 to 2016-17: Legacy format with separate sheets per district
 # - 2017-18 to 2019-20: Intermediate format with consolidated sheets
@@ -24,9 +25,10 @@
 #' @return Named list of URLs keyed by end_year
 #' @keywords internal
 get_enrollment_urls <- function() {
+  # Note: 2025 data URL is currently unavailable from NDE
+  # The original URL was removed/replaced by NDE in late 2025
   list(
     "2026" = "https://webapp-strapi-paas-prod-nde-001.azurewebsites.net/uploads/suppressed_2025_2026_school_year_enrollment_counts_for_website_11_03_25_c9f4d44d51.xlsx",
-    "2025" = "https://webapp-strapi-paas-prod-nde-001.azurewebsites.net/uploads/2024_2025_school_year_validation_day_student_counts_16036836ca.xlsx",
     "2024" = "https://webapp-strapi-paas-prod-nde-001.azurewebsites.net/uploads/2023_2024_school_year_validation_day_student_counts_2e68b10570.xlsx",
     "2023" = "https://webapp-strapi-paas-prod-nde-001.azurewebsites.net/uploads/2022_2023_enrollment_numbers_2224fa62e5.xlsx",
     "2022" = "https://webapp-strapi-paas-prod-nde-001.azurewebsites.net/uploads/2021_2022schoolyearcounts1021_0199ab6d3b.xlsx",
@@ -46,7 +48,8 @@ get_enrollment_urls <- function() {
 #' from the Nevada Department of Education.
 #'
 #' Nevada provides enrollment data from 2015-16 (end year 2016) through
-#' 2025-26 (end year 2026).
+#' 2025-26 (end year 2026), except 2024-25 (end year 2025) which is
+#' currently unavailable.
 #'
 #' @return Integer vector of available years
 #' @export

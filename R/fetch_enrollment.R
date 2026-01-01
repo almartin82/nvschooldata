@@ -5,7 +5,8 @@
 # This file contains functions for downloading enrollment data from the
 # Nevada Department of Education (NDE).
 #
-# Data is available from 2015-16 (end_year = 2016) through 2025-26 (end_year = 2026).
+# Data is available from 2015-16 (end_year = 2016) through 2025-26 (end_year = 2026),
+# except 2024-25 (end_year = 2025) which is currently unavailable from NDE.
 #
 # ==============================================================================
 
@@ -22,8 +23,8 @@
 #'   \item 2021-2026: Modern format (full school/district data with demographics)
 #' }
 #'
-#' @param end_year A school year. Year is the end of the academic year - eg 2024-25
-#'   school year is year '2025'. Valid values are 2016 through 2026.
+#' @param end_year A school year. Year is the end of the academic year - eg 2023-24
+#'   school year is year '2024'. Use `list_enr_years()` to see available years.
 #' @param tidy If TRUE (default), returns data in long (tidy) format with subgroup
 #'   column. If FALSE, returns wide format with one row per entity/grade.
 #' @param use_cache If TRUE (default), uses locally cached data when available.
@@ -46,17 +47,17 @@
 #' @export
 #' @examples
 #' \dontrun{
-#' # Get 2025 enrollment data (2024-25 school year)
-#' enr_2025 <- fetch_enr(2025)
+#' # Get 2026 enrollment data (2025-26 school year)
+#' enr_2026 <- fetch_enr(2026)
 #'
 #' # Get wide format (one row per entity/grade)
-#' enr_wide <- fetch_enr(2025, tidy = FALSE)
+#' enr_wide <- fetch_enr(2026, tidy = FALSE)
 #'
 #' # Force fresh download (ignore cache)
-#' enr_fresh <- fetch_enr(2025, use_cache = FALSE)
+#' enr_fresh <- fetch_enr(2026, use_cache = FALSE)
 #'
 #' # Get multiple years
-#' enr_multi <- purrr::map_df(2021:2025, fetch_enr)
+#' enr_multi <- purrr::map_df(c(2021:2024, 2026), fetch_enr)
 #' }
 fetch_enr <- function(end_year, tidy = TRUE, use_cache = TRUE) {
 

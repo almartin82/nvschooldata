@@ -36,7 +36,8 @@ This vignette explores Nevada's public school enrollment data, surfacing key tre
 Nevada was one of America's fastest-growing states for decades, but school enrollment has flattened in recent years. The COVID era marked a turning point.
 
 ```{r statewide-trend}
-enr <- fetch_enr_multi(2021:2026)
+# Note: 2025 data temporarily unavailable from NDE
+enr <- fetch_enr_multi(c(2021:2024, 2026))
 
 state_totals <- enr |>
   filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL") |>
