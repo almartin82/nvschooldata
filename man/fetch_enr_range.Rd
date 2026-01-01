@@ -2,7 +2,7 @@
 % Please edit documentation in R/fetch_enrollment.R
 \name{fetch_enr_range}
 \alias{fetch_enr_range}
-\title{Fetch enrollment data for multiple years}
+\title{Fetch enrollment data for a range of years}
 \usage{
 fetch_enr_range(start_year, end_year, tidy = TRUE, use_cache = TRUE)
 }

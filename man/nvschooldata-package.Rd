@@ -59,6 +59,7 @@ Nevada uses several identifier systems:
 \seealso{
 Useful links:
 \itemize{
+  \item \url{https://almartin82.github.io/nvschooldata}
   \item \url{https://github.com/almartin82/nvschooldata}
   \item Report bugs at \url{https://github.com/almartin82/nvschooldata/issues}
 }

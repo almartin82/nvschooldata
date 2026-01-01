@@ -21,6 +21,6 @@ Matches on district name containing the county name.
 \examples{
 \dontrun{
 # Get Clark County schools
-clark <- fetch_enr(2025) \%>\% filter_county("Clark")
+clark <- fetch_enr(2025) |> filter_county("Clark")
 }
 }

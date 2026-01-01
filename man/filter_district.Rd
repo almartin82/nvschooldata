@@ -24,6 +24,6 @@ using the LEA code or district code.
 \examples{
 \dontrun{
 # Get Clark County School District (code 02)
-ccsd <- fetch_enr(2025) \%>\% filter_district("02")
+ccsd <- fetch_enr(2025) |> filter_district("02")
 }
 }
