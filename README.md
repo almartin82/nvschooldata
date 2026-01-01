@@ -1,7 +1,10 @@
 # nvschooldata
 
+<!-- badges: start -->
 [![R-CMD-check](https://github.com/almartin82/nvschooldata/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/almartin82/nvschooldata/actions/workflows/R-CMD-check.yaml)
 [![Python Tests](https://github.com/almartin82/nvschooldata/actions/workflows/python-test.yaml/badge.svg)](https://github.com/almartin82/nvschooldata/actions/workflows/python-test.yaml)
+[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+<!-- badges: end -->
 
 Fetch and analyze Nevada school enrollment data from [NVDOE](https://doe.nv.gov/offices/office-of-assessment-data-and-accountability-management-adam/accountability/data-requests/enrollment-for-nevada-public-schools) in R or Python.
 
