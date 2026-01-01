@@ -1,11 +1,10 @@
 Package: nvschooldata
-Title: Fetch and Process Nevada School Data
+Title: Nevada School Data
 Version: 0.1.0
 Authors@R:
     person("Al", "Martin", , "almartin@example.com", role = c("aut", "cre"))
-Description: Downloads and processes school data from the Nevada Department of
-    Education (NDE). Provides functions for fetching enrollment data and
-    transforming it into tidy format for analysis.
+Description: A simple, consistent interface for accessing Nevada
+    school data in R.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
