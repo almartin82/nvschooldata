@@ -1,5 +1,7 @@
 # nvschooldata
 
+[![R-CMD-check](https://github.com/almartin82/nvschooldata/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/almartin82/nvschooldata/actions/workflows/R-CMD-check.yaml)
+
 Fetch and analyze Nevada public school enrollment data from the Nevada Department of Education.
 
 ## What can you find with nvschooldata?
