@@ -55,13 +55,13 @@ tidy_enr <- function(df) {
     tidy_subgroups <- purrr::map_df(
       all_subgroups,
       function(.x) {
-        df %>%
-          dplyr::rename(n_students = dplyr::all_of(.x)) %>%
-          dplyr::select(dplyr::all_of(c(invariants, "n_students", "enrollment_total"))) %>%
+        df |>
+          dplyr::rename(n_students = dplyr::all_of(.x)) |>
+          dplyr::select(dplyr::all_of(c(invariants, "n_students", "enrollment_total"))) |>
           dplyr::mutate(
             subgroup = .x,
             pct = n_students / enrollment_total
-          ) %>%
+          ) |>
           dplyr::select(dplyr::all_of(c(invariants, "subgroup", "n_students", "pct")))
       }
     )
@@ -71,20 +71,20 @@ tidy_enr <- function(df) {
 
   # Extract total enrollment as a "subgroup"
   if ("enrollment_total" %in% names(df)) {
-    tidy_total <- df %>%
-      dplyr::select(dplyr::all_of(c(invariants, "enrollment_total"))) %>%
+    tidy_total <- df |>
+      dplyr::select(dplyr::all_of(c(invariants, "enrollment_total"))) |>
       dplyr::mutate(
         n_students = enrollment_total,
         subgroup = "total_enrollment",
         pct = 1.0
-      ) %>%
+      ) |>
       dplyr::select(dplyr::all_of(c(invariants, "subgroup", "n_students", "pct")))
   } else {
     tidy_total <- NULL
   }
 
   # Combine all tidy data
-  dplyr::bind_rows(tidy_total, tidy_subgroups) %>%
+  dplyr::bind_rows(tidy_total, tidy_subgroups) |>
     dplyr::filter(!is.na(n_students))
 }
 
@@ -103,7 +103,7 @@ tidy_enr <- function(df) {
 #' }
 id_enr_aggs <- function(df) {
 
-  result <- df %>%
+  result <- df |>
     dplyr::mutate(
       # State level: entity_type == "State"
       is_state = entity_type == "State",
@@ -117,13 +117,13 @@ id_enr_aggs <- function(df) {
 
   # Charter schools (SPCSA districts) - only if lea_name exists
   if ("lea_name" %in% names(df)) {
-    result <- result %>%
+    result <- result |>
       dplyr::mutate(
         is_charter = !is.na(lea_name) &
           grepl("Charter|SPCSA", lea_name, ignore.case = TRUE)
       )
   } else if ("district_name" %in% names(df)) {
-    result <- result %>%
+    result <- result |>
       dplyr::mutate(
         is_charter = !is.na(district_name) &
           grepl("Charter|SPCSA", district_name, ignore.case = TRUE)
@@ -162,49 +162,49 @@ enr_grade_aggs <- function(df) {
   group_vars <- group_vars[group_vars %in% names(df)]
 
   # K-8 aggregate
-  k8_agg <- df %>%
+  k8_agg <- df |>
     dplyr::filter(
       subgroup == "total_enrollment",
       grade_level %in% c("K", "01", "02", "03", "04", "05", "06", "07", "08")
-    ) %>%
-    dplyr::group_by(dplyr::across(dplyr::all_of(group_vars))) %>%
+    ) |>
+    dplyr::group_by(dplyr::across(dplyr::all_of(group_vars))) |>
     dplyr::summarize(
       n_students = sum(n_students, na.rm = TRUE),
       .groups = "drop"
-    ) %>%
+    ) |>
     dplyr::mutate(
       grade_level = "K8",
       pct = NA_real_
     )
 
   # High school (9-12) aggregate
-  hs_agg <- df %>%
+  hs_agg <- df |>
     dplyr::filter(
       subgroup == "total_enrollment",
       grade_level %in% c("09", "10", "11", "12")
-    ) %>%
-    dplyr::group_by(dplyr::across(dplyr::all_of(group_vars))) %>%
+    ) |>
+    dplyr::group_by(dplyr::across(dplyr::all_of(group_vars))) |>
     dplyr::summarize(
       n_students = sum(n_students, na.rm = TRUE),
       .groups = "drop"
-    ) %>%
+    ) |>
     dplyr::mutate(
       grade_level = "HS",
       pct = NA_real_
     )
 
   # K-12 aggregate (excludes PK)
-  k12_agg <- df %>%
+  k12_agg <- df |>
     dplyr::filter(
       subgroup == "total_enrollment",
       grade_level %in% c("K", "01", "02", "03", "04", "05", "06", "07", "08",
                          "09", "10", "11", "12")
-    ) %>%
-    dplyr::group_by(dplyr::across(dplyr::all_of(group_vars))) %>%
+    ) |>
+    dplyr::group_by(dplyr::across(dplyr::all_of(group_vars))) |>
     dplyr::summarize(
       n_students = sum(n_students, na.rm = TRUE),
       .groups = "drop"
-    ) %>%
+    ) |>
     dplyr::mutate(
       grade_level = "K12",
       pct = NA_real_
@@ -228,17 +228,17 @@ enr_grade_aggs <- function(df) {
 #' @examples
 #' \dontrun{
 #' # Get Clark County School District (code 02)
-#' ccsd <- fetch_enr(2025) %>% filter_district("02")
+#' ccsd <- fetch_enr(2025) |> filter_district("02")
 #' }
 filter_district <- function(df, code, include_schools = TRUE) {
   # Ensure code is properly formatted
   code <- sprintf("%02d", as.integer(code))
 
   if (include_schools) {
-    df %>%
+    df |>
       dplyr::filter(lea_code == code | district_code == code)
   } else {
-    df %>%
+    df |>
       dplyr::filter(
         (lea_code == code | district_code == code),
         entity_type == "District"
@@ -259,10 +259,10 @@ filter_district <- function(df, code, include_schools = TRUE) {
 #' @examples
 #' \dontrun{
 #' # Get Clark County schools
-#' clark <- fetch_enr(2025) %>% filter_county("Clark")
+#' clark <- fetch_enr(2025) |> filter_county("Clark")
 #' }
 filter_county <- function(df, county_name) {
-  df %>%
+  df |>
     dplyr::filter(
       grepl(county_name, district_name, ignore.case = TRUE) |
       grepl(county_name, lea_name, ignore.case = TRUE)

@@ -95,7 +95,7 @@ fetch_enr <- function(end_year, tidy = TRUE, use_cache = TRUE) {
 
   # Optionally tidy
   if (tidy) {
-    processed <- tidy_enr(processed) %>%
+    processed <- tidy_enr(processed) |>
       id_enr_aggs()
   }
 
@@ -160,12 +160,12 @@ get_state_enrollment <- function(end_year, use_cache = TRUE) {
     df <- fetch_enr(y, tidy = TRUE, use_cache = use_cache)
 
     # Aggregate to state level
-    df %>%
+    df |>
       dplyr::filter(
         entity_type == "District",
         subgroup == "total_enrollment",
         grade_level == "TOTAL"
-      ) %>%
+      ) |>
       dplyr::summarize(
         end_year = y,
         n_districts = dplyr::n_distinct(district_code),
