@@ -13,13 +13,22 @@ reference:
   contents:
   - fetch_enr
   - fetch_enr_multi
+  - fetch_enr_range
   - get_available_years
+  - list_enr_years
+  - get_state_enrollment
+  - import_local_enrollment
 
 - title: Process & Tidy
   contents:
   - tidy_enr
   - id_enr_aggs
   - enr_grade_aggs
+
+- title: Filter Data
+  contents:
+  - filter_district
+  - filter_county
 
 - title: Cache Management
   contents:
