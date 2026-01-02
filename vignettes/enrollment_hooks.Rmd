@@ -182,15 +182,22 @@ Clark County (Las Vegas) and Washoe County (Reno) are Nevada's two urban anchors
 growth_data <- enr |>
   filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL",
          grepl("Clark|Washoe", district_name)) |>
-  group_by(district_name) |>
+  # Normalize district names (format changed across years)
+  mutate(county = case_when(
+    grepl("Clark", district_name) ~ "Clark County",
+    grepl("Washoe", district_name) ~ "Washoe County"
+  )) |>
+  group_by(county, end_year) |>
+  summarize(n_students = sum(n_students, na.rm = TRUE), .groups = "drop") |>
+  group_by(county) |>
   mutate(index = n_students / first(n_students) * 100) |>
   ungroup()
 
-ggplot(growth_data, aes(x = end_year, y = index, color = district_name)) +
+ggplot(growth_data, aes(x = end_year, y = index, color = county)) +
   geom_line(linewidth = 1.2) +
   geom_point(size = 2) +
   geom_hline(yintercept = 100, linetype = "dashed", color = "gray50") +
-  scale_color_manual(values = c("#BF0A30", "#002868")) +
+  scale_color_manual(values = c("Clark County" = "#BF0A30", "Washoe County" = "#002868")) +
   labs(
     title = "Clark vs Washoe County Enrollment Trends",
     subtitle = "Indexed to 2021 = 100",
