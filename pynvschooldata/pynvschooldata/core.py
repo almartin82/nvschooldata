@@ -124,27 +124,38 @@ def get_available_years() -> dict:
     pkg = _get_pkg()
     with localconverter(robjects.default_converter + pandas2ri.converter):
         r_result = pkg.get_available_years()
-        # Handle both dict-like (NamedList) and R vector (rx2) access
+        # Handle different result types from rpy2
         if isinstance(r_result, dict):
             return {
                 "min_year": int(r_result["min_year"]),
                 "max_year": int(r_result["max_year"]),
             }
         elif hasattr(r_result, "rx2"):
+            # R vector with rx2 access
             return {
                 "min_year": int(r_result.rx2("min_year")[0]),
                 "max_year": int(r_result.rx2("max_year")[0]),
             }
-        else:
-            # NamedList or similar - access by key, value may be a list
-            min_val = r_result["min_year"]
-            max_val = r_result["max_year"]
-            # Handle case where values are lists/arrays
-            if hasattr(min_val, "__getitem__") and not isinstance(min_val, (int, float)):
+        elif hasattr(r_result, "names") and r_result.names is not None:
+            # NamedList - access by finding index from names
+            names = list(r_result.names)
+            min_idx = names.index("min_year")
+            max_idx = names.index("max_year")
+            min_val = r_result[min_idx]
+            max_val = r_result[max_idx]
+            # Values may be arrays/lists - extract first element
+            if hasattr(min_val, "__getitem__") and not isinstance(min_val, (int, float, str)):
                 min_val = min_val[0]
-            if hasattr(max_val, "__getitem__") and not isinstance(max_val, (int, float)):
+            if hasattr(max_val, "__getitem__") and not isinstance(max_val, (int, float, str)):
                 max_val = max_val[0]
             return {
                 "min_year": int(min_val),
                 "max_year": int(max_val),
+            }
+        else:
+            # Last resort - try dict-like conversion
+            result_dict = dict(r_result)
+            return {
+                "min_year": int(result_dict["min_year"]),
+                "max_year": int(result_dict["max_year"]),
             }
