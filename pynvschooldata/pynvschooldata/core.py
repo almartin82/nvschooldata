@@ -136,9 +136,15 @@ def get_available_years() -> dict:
                 "min_year": int(r_result.rx2("min_year")[0]),
                 "max_year": int(r_result.rx2("max_year")[0]),
             }
-        elif hasattr(r_result, "names") and r_result.names is not None:
+        elif hasattr(r_result, "names"):
             # NamedList - access by finding index from names
-            names = list(r_result.names)
+            # names may be a method or property depending on rpy2 version
+            names_attr = r_result.names
+            if callable(names_attr):
+                names_attr = names_attr()
+            if names_attr is None:
+                raise ValueError("R result has no names attribute")
+            names = list(names_attr)
             min_idx = names.index("min_year")
             max_idx = names.index("max_year")
             min_val = r_result[min_idx]
