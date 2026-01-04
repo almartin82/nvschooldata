@@ -53,8 +53,8 @@ Education. Data is available from the NDE website.</p>
 
 
 <dl><dt id="arg-end-year">end_year<a class="anchor" aria-label="anchor" href="#arg-end-year"></a></dt>
-<dd><p>A school year. Year is the end of the academic year - eg 2024-25
-school year is year '2025'. Valid values are 2016 through 2026.</p></dd>
+<dd><p>A school year. Year is the end of the academic year - eg 2023-24
+school year is year '2024'. Use <code><a href="list_enr_years.html">list_enr_years()</a></code> to see available years.</p></dd>
 
 
 <dt id="arg-tidy">tidy<a class="anchor" aria-label="anchor" href="#arg-tidy"></a></dt>
@@ -93,17 +93,17 @@ Data formats vary by year:</p><ul><li><p>2016-2017: Legacy format (limited data 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
-<span class="r-in"><span><span class="co"># Get 2025 enrollment data (2024-25 school year)</span></span></span>
-<span class="r-in"><span><span class="va">enr_2025</span> <span class="op">&lt;-</span> <span class="fu">fetch_enr</span><span class="op">(</span><span class="fl">2025</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># Get 2026 enrollment data (2025-26 school year)</span></span></span>
+<span class="r-in"><span><span class="va">enr_2026</span> <span class="op">&lt;-</span> <span class="fu">fetch_enr</span><span class="op">(</span><span class="fl">2026</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Get wide format (one row per entity/grade)</span></span></span>
-<span class="r-in"><span><span class="va">enr_wide</span> <span class="op">&lt;-</span> <span class="fu">fetch_enr</span><span class="op">(</span><span class="fl">2025</span>, tidy <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">enr_wide</span> <span class="op">&lt;-</span> <span class="fu">fetch_enr</span><span class="op">(</span><span class="fl">2026</span>, tidy <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Force fresh download (ignore cache)</span></span></span>
-<span class="r-in"><span><span class="va">enr_fresh</span> <span class="op">&lt;-</span> <span class="fu">fetch_enr</span><span class="op">(</span><span class="fl">2025</span>, use_cache <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">enr_fresh</span> <span class="op">&lt;-</span> <span class="fu">fetch_enr</span><span class="op">(</span><span class="fl">2026</span>, use_cache <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Get multiple years</span></span></span>
-<span class="r-in"><span><span class="va">enr_multi</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/purrr/man/map_dfr.html" class="external-link">map_df</a></span><span class="op">(</span><span class="fl">2021</span><span class="op">:</span><span class="fl">2025</span>, <span class="va">fetch_enr</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">enr_multi</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map_dfr.html" class="external-link">map_df</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2021</span><span class="op">:</span><span class="fl">2024</span>, <span class="fl">2026</span><span class="op">)</span>, <span class="va">fetch_enr</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
