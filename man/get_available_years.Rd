@@ -10,7 +10,7 @@ get_available_years()
 A list with three elements:
 \describe{
 \item{min_year}{The earliest available school year end (e.g., 2016 = 2015-16)}
-\item{max_year}{The most recent available school year end (e.g., 2026 = 2025-26)}
+\item{max_year}{The most recent available school year end (e.g., 2024 = 2023-24)}
 \item{description}{A human-readable description of data availability}
 }
 }

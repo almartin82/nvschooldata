@@ -229,6 +229,149 @@ charter_enr |>
   select(sector, students, districts)
 ```
 
+```{r charter-chart}
+charter_enr |>
+  ggplot(aes(x = sector, y = students, fill = sector)) +
+  geom_col(show.legend = FALSE) +
+  geom_text(aes(label = scales::comma(students)), vjust = -0.2, size = 4) +
+  scale_y_continuous(labels = scales::comma, expand = expansion(mult = c(0, 0.15))) +
+  scale_fill_manual(values = c("Charter (SPCSA)" = "#E67300", "Traditional Districts" = "#003366")) +
+  labs(
+    title = "Traditional vs Charter School Enrollment (2026)",
+    subtitle = "SPCSA manages Nevada's state-sponsored charter sector",
+    x = NULL,
+    y = "Number of Students"
+  )
+```
+
+---
+
+## 7. Washoe County: Nevada's second city
+
+Washoe County (Reno-Sparks) is Nevada's second-largest district. While smaller than Clark County, it educates over 60,000 students.
+
+```{r washoe}
+washoe_data <- enr |>
+  filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL",
+         grepl("Washoe", district_name)) |>
+  group_by(end_year) |>
+  summarize(n_students = sum(n_students, na.rm = TRUE), .groups = "drop") |>
+  mutate(change = n_students - lag(n_students),
+         pct_change = round(change / lag(n_students) * 100, 2))
+
+washoe_data
+```
+
+```{r washoe-chart}
+ggplot(washoe_data, aes(x = end_year, y = n_students)) +
+  geom_line(linewidth = 1.2, color = "#002868") +
+  geom_point(size = 3, color = "#002868") +
+  scale_y_continuous(labels = scales::comma, limits = c(0, NA)) +
+  labs(
+    title = "Washoe County School District Enrollment",
+    subtitle = "Reno-Sparks metro area trends",
+    x = "School Year (ending)",
+    y = "Total Enrollment"
+  )
+```
+
+---
+
+## 8. Grade-level enrollment patterns
+
+Tracking enrollment by grade reveals where schools are growing or shrinking. Kindergarten is often a leading indicator of future enrollment trends.
+
+```{r grade-levels}
+grade_data <- enr_2026 |>
+  filter(is_district, subgroup == "total_enrollment",
+         !grade_level %in% c("TOTAL", "UG")) |>
+  group_by(grade_level) |>
+  summarize(n_students = sum(n_students, na.rm = TRUE), .groups = "drop") |>
+  mutate(grade_level = factor(grade_level, levels = c("PK", "K", sprintf("%02d", 1:12))))
+
+grade_data
+```
+
+```{r grade-chart}
+ggplot(grade_data, aes(x = grade_level, y = n_students, fill = grade_level)) +
+  geom_col(show.legend = FALSE) +
+  scale_y_continuous(labels = scales::comma) +
+  scale_fill_viridis_d(option = "viridis") +
+  labs(
+    title = "Nevada Enrollment by Grade Level (2026)",
+    subtitle = "Distribution across K-12 grades",
+    x = "Grade Level",
+    y = "Number of Students"
+  )
+```
+
+---
+
+## 9. Gender enrollment balance
+
+How does the male/female ratio vary across Nevada? Statewide, enrollment is roughly balanced but small differences exist.
+
+```{r gender}
+gender_data <- enr_2026 |>
+  filter(is_district, grade_level == "TOTAL",
+         subgroup %in% c("male", "female")) |>
+  group_by(subgroup) |>
+  summarize(n_students = sum(n_students, na.rm = TRUE), .groups = "drop") |>
+  mutate(pct = round(n_students / sum(n_students) * 100, 1))
+
+gender_data
+```
+
+```{r gender-chart}
+ggplot(gender_data, aes(x = subgroup, y = n_students, fill = subgroup)) +
+  geom_col(show.legend = FALSE) +
+  geom_text(aes(label = paste0(scales::comma(n_students), "\n(", pct, "%)")),
+            vjust = -0.2, size = 4) +
+  scale_y_continuous(labels = scales::comma, expand = expansion(mult = c(0, 0.15))) +
+  scale_fill_manual(values = c("female" = "#CC3366", "male" = "#336699")) +
+  labs(
+    title = "Nevada Enrollment by Gender (2026)",
+    subtitle = "Statewide male/female distribution",
+    x = NULL,
+    y = "Number of Students"
+  )
+```
+
+---
+
+## 10. Special populations across districts
+
+English Learners, students with IEPs, and Free/Reduced Lunch eligible students represent key populations for educational policy. How do the two largest districts compare?
+
+```{r special-populations}
+special_pops <- enr_2026 |>
+  filter(is_district, grade_level == "TOTAL",
+         subgroup %in% c("frl", "iep", "el"),
+         grepl("Clark|Washoe", district_name)) |>
+  mutate(county = ifelse(grepl("Clark", district_name), "Clark County", "Washoe County")) |>
+  group_by(county, subgroup) |>
+  summarize(n_students = sum(n_students, na.rm = TRUE), .groups = "drop")
+
+special_pops
+```
+
+```{r special-pops-chart}
+ggplot(special_pops, aes(x = subgroup, y = n_students, fill = county)) +
+  geom_col(position = "dodge") +
+  geom_text(aes(label = scales::comma(n_students)),
+            position = position_dodge(width = 0.9), vjust = -0.2, size = 3) +
+  scale_y_continuous(labels = scales::comma, expand = expansion(mult = c(0, 0.15))) +
+  scale_fill_manual(values = c("Clark County" = "#BF0A30", "Washoe County" = "#002868")) +
+  scale_x_discrete(labels = c("el" = "English\nLearners", "frl" = "Free/Reduced\nLunch", "iep" = "Students\nwith IEPs")) +
+  labs(
+    title = "Special Populations: Clark vs Washoe County (2026)",
+    subtitle = "EL, FRL, and IEP student counts",
+    x = NULL,
+    y = "Number of Students",
+    fill = "District"
+  )
+```
+
 ---
 
 ## Summary

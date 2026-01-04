@@ -16,7 +16,8 @@ Integer vector of available years
 ## Details
 
 Nevada provides enrollment data from 2015-16 (end year 2016) through
-2025-26 (end year 2026).
+2025-26 (end year 2026), except 2024-25 (end year 2025) which is
+currently unavailable.
 
 ## Examples
 
