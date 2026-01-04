@@ -19,7 +19,7 @@ A list with three elements:
 
 - max_year:
 
-  The most recent available school year end (e.g., 2026 = 2025-26)
+  The most recent available school year end (e.g., 2024 = 2023-24)
 
 - description:
 
@@ -32,5 +32,5 @@ years <- get_available_years()
 years$min_year
 #> [1] 2016
 years$max_year
-#> [1] 2024
+#> [1] 2026
 ```
