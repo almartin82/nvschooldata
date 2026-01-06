@@ -112,7 +112,14 @@ id_enr_aggs <- function(df) {
       is_district = entity_type == "District",
 
       # School level: entity_type == "School"
-      is_school = entity_type == "School"
+      is_school = entity_type == "School",
+
+      # Aggregation flag based on ID presence
+      aggregation_flag = dplyr::case_when(
+        !is.na(school_code) & school_code != "" ~ "campus",
+        !is.na(district_code) & district_code != "" ~ "district",
+        TRUE ~ "state"
+      )
     )
 
   # Charter schools (SPCSA districts) - only if lea_name exists
