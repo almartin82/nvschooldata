@@ -18,6 +18,7 @@ reference:
   - fetch_enr
   - fetch_enr_multi
   - fetch_enr_range
+  - fetch_directory
   - get_available_years
   - list_enr_years
   - get_state_enrollment
@@ -38,3 +39,7 @@ reference:
   contents:
   - cache_status
   - starts_with("clear")
+  - starts_with("cache_exists")
+  - starts_with("build_cache_path")
+  - starts_with("read_cache")
+  - starts_with("write_cache")
