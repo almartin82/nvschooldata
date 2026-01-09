@@ -37,7 +37,7 @@ Nevada was one of America's fastest-growing states for decades, but school enrol
 
 ```{r statewide-trend}
 # Note: 2025 data temporarily unavailable from NDE
-enr <- fetch_enr_multi(c(2021:2024, 2026, use_cache = TRUE))
+enr <- fetch_enr_multi(c(2021:2024, 2026), use_cache = TRUE)
 
 state_totals <- enr |>
   filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL") |>
