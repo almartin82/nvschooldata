@@ -1,16 +1,22 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>https://almartin82.github.io/nvschooldata/404.html</loc></url>
 <url><loc>https://almartin82.github.io/nvschooldata/CLAUDE.html</loc></url>
+<url><loc>https://almartin82.github.io/nvschooldata/EXPANSION_ASSESSMENT.html</loc></url>
 <url><loc>https://almartin82.github.io/nvschooldata/LICENSE-text.html</loc></url>
 <url><loc>https://almartin82.github.io/nvschooldata/LICENSE.html</loc></url>
 <url><loc>https://almartin82.github.io/nvschooldata/articles/enrollment_hooks.html</loc></url>
 <url><loc>https://almartin82.github.io/nvschooldata/articles/index.html</loc></url>
 <url><loc>https://almartin82.github.io/nvschooldata/authors.html</loc></url>
 <url><loc>https://almartin82.github.io/nvschooldata/index.html</loc></url>
+<url><loc>https://almartin82.github.io/nvschooldata/reference/build_cache_path_directory.html</loc></url>
+<url><loc>https://almartin82.github.io/nvschooldata/reference/build_directory_url.html</loc></url>
 <url><loc>https://almartin82.github.io/nvschooldata/reference/cache_exists.html</loc></url>
+<url><loc>https://almartin82.github.io/nvschooldata/reference/cache_exists_directory.html</loc></url>
 <url><loc>https://almartin82.github.io/nvschooldata/reference/cache_status.html</loc></url>
+<url><loc>https://almartin82.github.io/nvschooldata/reference/clear_directory_cache.html</loc></url>
 <url><loc>https://almartin82.github.io/nvschooldata/reference/clear_enr_cache.html</loc></url>
 <url><loc>https://almartin82.github.io/nvschooldata/reference/enr_grade_aggs.html</loc></url>
+<url><loc>https://almartin82.github.io/nvschooldata/reference/fetch_directory.html</loc></url>
 <url><loc>https://almartin82.github.io/nvschooldata/reference/fetch_enr.html</loc></url>
 <url><loc>https://almartin82.github.io/nvschooldata/reference/fetch_enr_multi.html</loc></url>
 <url><loc>https://almartin82.github.io/nvschooldata/reference/fetch_enr_range.html</loc></url>
@@ -21,6 +27,7 @@
 <url><loc>https://almartin82.github.io/nvschooldata/reference/get_cache_path.html</loc></url>
 <url><loc>https://almartin82.github.io/nvschooldata/reference/get_enrollment_urls.html</loc></url>
 <url><loc>https://almartin82.github.io/nvschooldata/reference/get_format_type.html</loc></url>
+<url><loc>https://almartin82.github.io/nvschooldata/reference/get_raw_directory.html</loc></url>
 <url><loc>https://almartin82.github.io/nvschooldata/reference/get_raw_enr.html</loc></url>
 <url><loc>https://almartin82.github.io/nvschooldata/reference/get_raw_enr_intermediate.html</loc></url>
 <url><loc>https://almartin82.github.io/nvschooldata/reference/get_raw_enr_legacy.html</loc></url>
@@ -31,6 +38,7 @@
 <url><loc>https://almartin82.github.io/nvschooldata/reference/index.html</loc></url>
 <url><loc>https://almartin82.github.io/nvschooldata/reference/list_enr_years.html</loc></url>
 <url><loc>https://almartin82.github.io/nvschooldata/reference/nvschooldata-package.html</loc></url>
+<url><loc>https://almartin82.github.io/nvschooldata/reference/process_directory.html</loc></url>
 <url><loc>https://almartin82.github.io/nvschooldata/reference/process_district_data.html</loc></url>
 <url><loc>https://almartin82.github.io/nvschooldata/reference/process_enr.html</loc></url>
 <url><loc>https://almartin82.github.io/nvschooldata/reference/process_enr_intermediate.html</loc></url>
@@ -39,9 +47,11 @@
 <url><loc>https://almartin82.github.io/nvschooldata/reference/process_school_grades.html</loc></url>
 <url><loc>https://almartin82.github.io/nvschooldata/reference/process_school_totals.html</loc></url>
 <url><loc>https://almartin82.github.io/nvschooldata/reference/read_cache.html</loc></url>
+<url><loc>https://almartin82.github.io/nvschooldata/reference/read_cache_directory.html</loc></url>
 <url><loc>https://almartin82.github.io/nvschooldata/reference/safe_numeric.html</loc></url>
 <url><loc>https://almartin82.github.io/nvschooldata/reference/standardize_grade.html</loc></url>
 <url><loc>https://almartin82.github.io/nvschooldata/reference/tidy_enr.html</loc></url>
 <url><loc>https://almartin82.github.io/nvschooldata/reference/write_cache.html</loc></url>
+<url><loc>https://almartin82.github.io/nvschooldata/reference/write_cache_directory.html</loc></url>
 </urlset>
 
