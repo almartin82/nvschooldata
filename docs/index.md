@@ -29,6 +29,15 @@ enr %>%
   mutate(pct_of_state = n_students / sum(n_students) * 100) %>%
   filter(grepl("Clark", district_name)) %>%
   select(end_year, district_name, n_students, pct_of_state)
+#> # A tibble: 5 × 4
+#> # Groups:   end_year [5]
+#>   end_year district_name                n_students pct_of_state
+#>      <dbl> <chr>                             <dbl>        <dbl>
+#> 1     2021 Clark County                     319293         65.6
+#> 2     2022 Clark County                     320245         65.0
+#> 3     2023 Clark County                     314372         64.2
+#> 4     2024 Clark County                     309397         63.7
+#> 5     2026 Clark County School District     291587         61.6
 ```
 
 Clark County consistently enrolls 70%+ of all Nevada students.
@@ -49,6 +58,12 @@ enr %>%
   select(end_year, n_students) %>%
   mutate(change = n_students - lag(n_students),
          pct_change = change / lag(n_students) * 100)
+#>   end_year n_students change pct_change
+#> 1     2021     319293     NA         NA
+#> 2     2022     320245    952  0.2981587
+#> 3     2023     314372  -5873 -1.8339084
+#> 4     2024     309397  -4975 -1.5825201
+#> 5     2026     291587 -17810 -5.7563583
 ```
 
 ------------------------------------------------------------------------
@@ -70,6 +85,14 @@ enr %>%
          pct = n_students / total * 100) %>%
   select(subgroup, n_students, pct) %>%
   arrange(desc(pct))
+#> # A tibble: 4 × 4
+#> # Groups:   district_name [1]
+#>   district_name                subgroup n_students   pct
+#>   <chr>                        <chr>         <dbl> <dbl>
+#> 1 Clark County School District hispanic     142657 54.3
+#> 2 Clark County School District white         54411 20.7
+#> 3 Clark County School District black         47438 18.1
+#> 4 Clark County School District asian         17998  6.86
 ```
 
 ------------------------------------------------------------------------
@@ -114,6 +137,12 @@ enr %>%
     n_districts = n_distinct(district_name),
     total_enrollment = sum(n_students, na.rm = TRUE)
   )
+#> # A tibble: 3 × 3
+#>   region          n_districts total_enrollment
+#>   <chr>                 <int>            <dbl>
+#> 1 Las Vegas Metro           1           291587
+#> 2 Reno Metro                1            63655
+#> 3 Rural Nevada             68           118415
 ```
 
 ------------------------------------------------------------------------
@@ -133,6 +162,14 @@ enr %>%
   summarize(total = sum(n_students, na.rm = TRUE), .groups = "drop") %>%
   tidyr::pivot_wider(names_from = is_spcsa, values_from = total,
                      names_prefix = "spcsa_")
+#> # A tibble: 5 × 3
+#>   end_year spcsa_FALSE spcsa_TRUE
+#>      <dbl>       <dbl>      <dbl>
+#> 1     2021      486183        450
+#> 2     2022      491878        460
+#> 3     2023      488899        698
+#> 4     2024      482949       2621
+#> 5     2026      468495       5162
 ```
 
 ------------------------------------------------------------------------
@@ -151,6 +188,20 @@ enr %>%
   group_by(district_name) %>%
   mutate(index = n_students / first(n_students) * 100) %>%
   select(end_year, district_name, n_students, index)
+#> # A tibble: 10 × 4
+#> # Groups:   district_name [4]
+#>    end_year district_name                 n_students index
+#>       <dbl> <chr>                              <dbl> <dbl>
+#>  1     2021 Clark County                      319293 100
+#>  2     2021 Washoe County                      64988 100
+#>  3     2022 Clark County                      320245 100.
+#>  4     2022 Washoe County                      66541 102.
+#>  5     2023 Clark County                      314372  98.5
+#>  6     2023 Washoe County                      64990 100.
+#>  7     2024 Clark County                      309397  96.9
+#>  8     2024 Washoe County                      64755  99.6
+#>  9     2026 Clark County School District      291587 100
+#> 10     2026 Washoe County School District      63655 100
 ```
 
 ------------------------------------------------------------------------
@@ -168,6 +219,8 @@ grade_aggs <- enr_grade_aggs(enr)
 grade_aggs %>%
   filter(is_district, grepl("Clark", district_name)) %>%
   select(grade_level, n_students)
+#> # A tibble: 0 × 2
+#> # ℹ 2 variables: grade_level <chr>, n_students <dbl>
 ```
 
 Compare K-8 vs high school (9-12) enrollment to see where growth is
@@ -191,6 +244,20 @@ enr %>%
   filter(subgroup == "female") %>%
   select(district_name, n_students, pct) %>%
   arrange(desc(pct))
+#> # A tibble: 10 × 3
+#> # Groups:   district_name [10]
+#>    district_name                                 n_students   pct
+#>    <chr>                                              <dbl> <dbl>
+#>  1 Young Women's Leadership Academy of Las Vegas        108 100
+#>  2 Do & Be Arts Academy of Excellence                   108  61.7
+#>  3 Nevada State High School II                           11  61.1
+#>  4 Nevada State High School                             447  58.1
+#>  5 Nevada Connections Academy                           726  56.6
+#>  6 Esmeralda County School District                      39  56.5
+#>  7 Nevada Prep                                          259  55.1
+#>  8 Rainbow Dreams Early Learning Academy                126  55.0
+#>  9 Discovery Charter School                             275  54.3
+#> 10 Thrive Point Academy of Nevada                       192  53.8
 ```
 
 ------------------------------------------------------------------------
@@ -209,6 +276,12 @@ enr %>%
   filter(grepl("Clark|Washoe", district_name)) %>%
   select(district_name, subgroup, n_students, pct) %>%
   tidyr::pivot_wider(names_from = subgroup, values_from = c(n_students, pct))
+#> # A tibble: 2 × 7
+#>   district_name      n_students_frl n_students_iep n_students_el pct_frl pct_iep
+#>   <chr>                       <dbl>          <dbl>         <dbl>   <dbl>   <dbl>
+#> 1 Clark County Scho…         282969          44484         45993   0.970   0.153
+#> 2 Washoe County Sch…          39010          10537          9229   0.613   0.166
+#> # ℹ 1 more variable: pct_el <dbl>
 ```
 
 ------------------------------------------------------------------------
