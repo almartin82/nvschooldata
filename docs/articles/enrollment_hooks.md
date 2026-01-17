@@ -22,7 +22,7 @@ turning point.
 
 ``` r
 # Note: 2025 data temporarily unavailable from NDE
-enr <- fetch_enr_multi(c(2021:2024, 2026))
+enr <- fetch_enr_multi(c(2021:2024, 2026), use_cache = TRUE)
 
 state_totals <- enr |>
   filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL") |>
@@ -65,7 +65,7 @@ Clark County School District (Las Vegas metro) is the 5th largest school
 district in America, enrolling more than 70% of all Nevada students.
 
 ``` r
-enr_2026 <- fetch_enr(2026)
+enr_2026 <- fetch_enr(2026, use_cache = TRUE)
 
 top_districts <- enr_2026 |>
   filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL") |>

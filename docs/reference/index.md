@@ -8,6 +8,8 @@
   : Fetch enrollment data for multiple years
 - [`fetch_enr_range()`](https://almartin82.github.io/nvschooldata/reference/fetch_enr_range.md)
   : Fetch enrollment data for a range of years
+- [`fetch_directory()`](https://almartin82.github.io/nvschooldata/reference/fetch_directory.md)
+  : Fetch Nevada school directory data
 - [`get_available_years()`](https://almartin82.github.io/nvschooldata/reference/get_available_years.md)
   : Get available years for enrollment data
 - [`list_enr_years()`](https://almartin82.github.io/nvschooldata/reference/list_enr_years.md)
@@ -37,5 +39,7 @@
 
 - [`cache_status()`](https://almartin82.github.io/nvschooldata/reference/cache_status.md)
   : Show cache status
+- [`clear_directory_cache()`](https://almartin82.github.io/nvschooldata/reference/clear_directory_cache.md)
+  : Clear school directory cache
 - [`clear_enr_cache()`](https://almartin82.github.io/nvschooldata/reference/clear_enr_cache.md)
   : Clear the nvschooldata cache
