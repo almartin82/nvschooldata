@@ -11,3 +11,4 @@
 ^pynvschooldata$
 ^py.*schooldata$
 ^vignettes/.*_cache$
+^EXPANSION_ASSESSMENT\.md$
