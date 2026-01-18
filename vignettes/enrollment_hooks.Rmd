@@ -389,3 +389,11 @@ These patterns shape school funding debates and facility planning across the Sil
 ---
 
 *Data sourced from the Nevada Department of Education [Enrollment Data](https://doe.nv.gov/offices/office-of-assessment-data-and-accountability-management-adam/accountability/data-requests/enrollment-for-nevada-public-schools).*
+
+---
+
+## Session Info
+
+```{r session-info}
+sessionInfo()
+```
