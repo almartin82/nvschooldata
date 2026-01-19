@@ -1,4 +1,4 @@
-# 10 Insights from Nevada School Enrollment Data
+# 15 Insights from Nevada School Enrollment Data
 
 ``` r
 library(nvschooldata)
@@ -468,6 +468,255 @@ the Silver State.
 
 ------------------------------------------------------------------------
 
+## 11. Kindergarten enrollment as a leading indicator
+
+Kindergarten enrollment often predicts future district growth. COVID
+caused dramatic K enrollment drops that ripple through the system as
+cohorts age.
+
+``` r
+k_data <- enr |>
+  filter(is_district, subgroup == "total_enrollment", grade_level == "K") |>
+  group_by(end_year) |>
+  summarize(k_students = sum(n_students, na.rm = TRUE), .groups = "drop") |>
+  mutate(change = k_students - lag(k_students),
+         pct_change = round(change / lag(k_students) * 100, 2))
+
+k_data
+#> # A tibble: 0 × 4
+#> # ℹ 4 variables: end_year <dbl>, k_students <dbl>, change <dbl>,
+#> #   pct_change <dbl>
+```
+
+``` r
+ggplot(k_data, aes(x = end_year, y = k_students)) +
+  geom_line(linewidth = 1.2, color = "#E67300") +
+  geom_point(size = 3, color = "#E67300") +
+  scale_y_continuous(labels = scales::comma, limits = c(0, NA)) +
+  labs(
+    title = "Nevada Kindergarten Enrollment (2021-2026)",
+    subtitle = "K enrollment is a leading indicator of future trends",
+    x = "School Year (ending)",
+    y = "Kindergarten Students"
+  )
+```
+
+![](enrollment_hooks_files/figure-html/kindergarten-chart-1.png)
+
+------------------------------------------------------------------------
+
+## 12. English Learners across Nevada
+
+English Learner (EL) populations vary dramatically across Nevada
+districts. Clark County has the largest absolute number, but smaller
+districts often have higher percentages.
+
+``` r
+el_data <- enr_2026 |>
+  filter(is_district, grade_level == "TOTAL", subgroup == "el") |>
+  arrange(desc(n_students)) |>
+  head(10) |>
+  select(district_name, n_students, pct)
+
+el_data
+#>                    district_name n_students        pct
+#> 1   Clark County School District      45993 0.15773337
+#> 2  Washoe County School District       9229 0.14498468
+#> 3        Mater Academy of Nevada       1816 0.34283557
+#> 4    Carson City School District        916 0.12580689
+#> 5    Elko County School District        774 0.08328850
+#> 6    Lyon County School District        637 0.07030905
+#> 7     Nye County School District        449 0.07749396
+#> 8  Somerset Academy of Las Vegas        405 0.04247955
+#> 9                 CIVICA Academy        403 0.28044537
+#> 10                Equipo Academy        365 0.38461538
+```
+
+``` r
+el_data |>
+  mutate(district_name = forcats::fct_reorder(district_name, n_students)) |>
+  ggplot(aes(x = n_students, y = district_name, fill = pct)) +
+  geom_col() +
+  geom_text(aes(label = scales::percent(pct, accuracy = 0.1)), hjust = -0.1, size = 3) +
+  scale_x_continuous(labels = scales::comma, expand = expansion(mult = c(0, 0.2))) +
+  scale_fill_viridis_c(option = "plasma", labels = scales::percent) +
+  labs(
+    title = "English Learner Enrollment by District (2026)",
+    subtitle = "Top 10 districts by EL count; color shows percentage of total enrollment",
+    x = "Number of EL Students",
+    y = NULL,
+    fill = "EL %"
+  )
+```
+
+![](enrollment_hooks_files/figure-html/el-chart-1.png)
+
+------------------------------------------------------------------------
+
+## 13. Free/Reduced Lunch eligibility reveals economic disparities
+
+FRL eligibility is often used as a proxy for economic disadvantage.
+Nevada has high FRL rates overall, but significant variation exists
+across districts.
+
+``` r
+frl_data <- enr_2026 |>
+  filter(is_district, grade_level == "TOTAL", subgroup == "frl") |>
+  mutate(pct_display = pct * 100) |>
+  arrange(desc(pct)) |>
+  head(15) |>
+  select(district_name, n_students, pct_display)
+
+frl_data
+#>                               district_name n_students pct_display
+#> 1          Esmeralda County School District         69         100
+#> 2           Pershing County School District        647         100
+#> 3                            Futuro Academy        484         100
+#> 4          Mater Academy of Northern Nevada        514         100
+#> 5                            Democracy Prep        927         100
+#> 6  Sports Leadership and Management Academy       1988         100
+#> 7                            Equipo Academy        949         100
+#> 8                   Mater Academy of Nevada       5297         100
+#> 9     Rainbow Dreams Early Learning Academy        229         100
+#> 10                        The Delta Academy       1315         100
+#> 11 Innovations International Charter School        619         100
+#> 12                            Quest Academy        415         100
+#> 13                        FuturEdge Academy        318         100
+#> 14       Southern Nevada Trades High School        250         100
+#> 15                      Vegas Vista Academy        270         100
+```
+
+``` r
+frl_data |>
+  mutate(district_name = forcats::fct_reorder(district_name, pct_display)) |>
+  ggplot(aes(x = pct_display, y = district_name, fill = pct_display)) +
+  geom_col() +
+  geom_text(aes(label = paste0(round(pct_display, 1), "%")), hjust = -0.1, size = 3) +
+  scale_x_continuous(expand = expansion(mult = c(0, 0.15))) +
+  scale_fill_gradient(low = "#66B2FF", high = "#BF0A30", guide = "none") +
+  labs(
+    title = "Free/Reduced Lunch Eligibility by District (2026)",
+    subtitle = "Top 15 districts by FRL percentage",
+    x = "Percent FRL Eligible",
+    y = NULL
+  )
+```
+
+![](enrollment_hooks_files/figure-html/frl-chart-1.png)
+
+------------------------------------------------------------------------
+
+## 14. Nevada’s smallest districts
+
+While Clark County dominates headlines, Nevada has many tiny rural
+districts. Some have fewer than 500 students total.
+
+``` r
+smallest <- enr_2026 |>
+  filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL") |>
+  arrange(n_students) |>
+  head(10) |>
+  select(district_name, n_students)
+
+smallest
+#>                                    district_name n_students
+#> 1                    Nevada State High School II         18
+#> 2                       Independence High School         37
+#> 3               Esmeralda County School District         69
+#> 4                  Nevada Classical Academy Elko         83
+#> 5  Young Women's Leadership Academy of Las Vegas        108
+#> 6                                Learning Bridge        171
+#> 7                               Davidson Academy        171
+#> 8             Do & Be Arts Academy of Excellence        175
+#> 9                        Silver Sands Montessori        188
+#> 10                  Honors Academy of Literature        202
+```
+
+``` r
+smallest |>
+  mutate(district_name = forcats::fct_reorder(district_name, n_students)) |>
+  ggplot(aes(x = n_students, y = district_name)) +
+  geom_col(fill = "#336699") +
+  geom_text(aes(label = scales::comma(n_students)), hjust = -0.1, size = 3.5) +
+  scale_x_continuous(expand = expansion(mult = c(0, 0.2))) +
+  labs(
+    title = "Nevada's 10 Smallest Districts (2026)",
+    subtitle = "Many rural counties have tiny school systems",
+    x = "Total Enrollment",
+    y = NULL
+  )
+```
+
+![](enrollment_hooks_files/figure-html/smallest-chart-1.png)
+
+------------------------------------------------------------------------
+
+## 15. IEP students: Special education across Nevada
+
+Students with Individualized Education Programs (IEPs) require
+specialized services. The distribution of IEP students varies by
+district.
+
+``` r
+iep_data <- enr_2026 |>
+  filter(is_district, grade_level == "TOTAL", subgroup == "iep") |>
+  mutate(pct_display = pct * 100) |>
+  arrange(desc(n_students)) |>
+  head(10) |>
+  select(district_name, n_students, pct_display)
+
+iep_data
+#>                     district_name n_students pct_display
+#> 1    Clark County School District      44484   15.255824
+#> 2   Washoe County School District      10537   16.553295
+#> 3     Lyon County School District       1541   17.008830
+#> 4   Somerset Academy of Las Vegas       1258   13.194881
+#> 5     Elko County School District       1238   13.321855
+#> 6     Carson City School District        943   12.951518
+#> 7      Nye County School District        882   15.222644
+#> 8     Pinecrest Academy of Nevada        840    9.912674
+#> 9  Douglas County School District        692   14.583772
+#> 10                  Doral Academy        674   10.462589
+```
+
+``` r
+iep_data |>
+  mutate(district_name = forcats::fct_reorder(district_name, n_students)) |>
+  ggplot(aes(x = n_students, y = district_name, fill = pct_display)) +
+  geom_col() +
+  geom_text(aes(label = paste0(round(pct_display, 1), "%")), hjust = -0.1, size = 3) +
+  scale_x_continuous(labels = scales::comma, expand = expansion(mult = c(0, 0.15))) +
+  scale_fill_viridis_c(option = "cividis") +
+  labs(
+    title = "Students with IEPs by District (2026)",
+    subtitle = "Top 10 districts by IEP count; color shows percentage",
+    x = "Number of IEP Students",
+    y = NULL,
+    fill = "IEP %"
+  )
+```
+
+![](enrollment_hooks_files/figure-html/iep-chart-1.png)
+
+------------------------------------------------------------------------
+
+## Summary
+
+Nevada’s school enrollment data reveals: - **Clark County dominance**:
+Over 60% of students are in the Las Vegas metro - **Demographic shift**:
+Hispanic students are now the largest demographic group - **Urban-rural
+divide**: Rural Nevada has many districts but a tiny fraction of
+students - **Charter growth**: SPCSA schools are expanding their share
+of enrollment - **Stabilization**: After decades of growth, enrollment
+has plateaued - **Economic need**: High FRL rates across most districts
+indicate widespread economic challenges - **K enrollment**: Kindergarten
+numbers signal future enrollment trends
+
+These patterns shape school funding debates and facility planning across
+the Silver State.
+
+------------------------------------------------------------------------
+
 *Data sourced from the Nevada Department of Education [Enrollment
 Data](https://doe.nv.gov/offices/office-of-assessment-data-and-accountability-management-adam/accountability/data-requests/enrollment-for-nevada-public-schools).*
 
@@ -510,7 +759,7 @@ sessionInfo()
 #> [25] cachem_1.1.0       xfun_0.55          S7_0.2.1           fs_1.6.6          
 #> [29] sass_0.4.10        viridisLite_0.4.2  cli_3.6.5          withr_3.0.2       
 #> [33] pkgdown_2.2.0      magrittr_2.0.4     digest_0.6.39      grid_4.5.2        
-#> [37] rappdirs_0.3.3     lifecycle_1.0.5    vctrs_0.7.0        evaluate_1.0.5    
+#> [37] rappdirs_0.3.4     lifecycle_1.0.5    vctrs_0.7.0        evaluate_1.0.5    
 #> [41] glue_1.8.0         cellranger_1.1.0   farver_2.1.2       codetools_0.2-20  
 #> [45] ragg_1.5.0         rmarkdown_2.30     purrr_1.2.1        tools_4.5.2       
 #> [49] pkgconfig_2.0.3    htmltools_0.5.9

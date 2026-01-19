@@ -4,299 +4,535 @@ Fetch and analyze Nevada school enrollment data from
 [NVDOE](https://doe.nv.gov/offices/office-of-assessment-data-and-accountability-management-adam/accountability/data-requests/enrollment-for-nevada-public-schools)
 in R or Python.
 
-## What can you find with nvschooldata?
+## Why nvschooldata?
 
-**10 years of enrollment data (2016-2026).** Over 500,000 students
-across 17 school districts and the State Public Charter School
-Authority. Here are ten stories hiding in the numbers:
+This package is part of the [State Schooldata
+Project](https://github.com/almartin82/njschooldata), which provides
+simple, consistent interfaces for accessing state-published school data.
+The original [njschooldata](https://github.com/almartin82/njschooldata)
+package for New Jersey inspired this 50-state effort to make state
+education data accessible without manual downloads or data wrangling.
+
+**What’s available:** 10 years of enrollment data (2016-2026) covering
+500,000+ students across 17 school districts and the State Public
+Charter School Authority. Demographic breakdowns include race/ethnicity,
+gender, and special populations (EL, FRL, IEP).
 
 ------------------------------------------------------------------------
 
-### 1. Clark County: A district the size of a state
+## 15 Insights from Nevada Enrollment Data
 
-Clark County School District (CCSD) enrolls more students than many
-entire states. It’s the 5th largest school district in America.
+### 1. Nevada’s enrollment has plateaued after decades of growth
+
+Nevada was one of America’s fastest-growing states for decades, but
+school enrollment has flattened in recent years. The COVID era marked a
+turning point.
 
 ``` r
 library(nvschooldata)
 library(dplyr)
+library(tidyr)
+library(ggplot2)
 
-enr <- fetch_enr_range(2021, 2026)
+# Note: 2025 data temporarily unavailable from NDE
+enr <- fetch_enr_multi(c(2021:2024, 2026), use_cache = TRUE)
 
-enr %>%
-  filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL") %>%
-  group_by(end_year) %>%
-  mutate(pct_of_state = n_students / sum(n_students) * 100) %>%
-  filter(grepl("Clark", district_name)) %>%
-  select(end_year, district_name, n_students, pct_of_state)
-#> # A tibble: 5 × 4
-#> # Groups:   end_year [5]
-#>   end_year district_name                n_students pct_of_state
-#>      <dbl> <chr>                             <dbl>        <dbl>
-#> 1     2021 Clark County                     319293         65.6
-#> 2     2022 Clark County                     320245         65.0
-#> 3     2023 Clark County                     314372         64.2
-#> 4     2024 Clark County                     309397         63.7
-#> 5     2026 Clark County School District     291587         61.6
+state_totals <- enr |>
+  filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL") |>
+  group_by(end_year) |>
+  summarize(n_students = sum(n_students, na.rm = TRUE), .groups = "drop") |>
+  mutate(change = n_students - lag(n_students),
+         pct_change = round(change / lag(n_students) * 100, 2))
+
+state_totals
+#> # A tibble: 5 x 4
+#>   end_year n_students change pct_change
+#>      <dbl>      <dbl>  <dbl>      <dbl>
+#> 1     2021     486633     NA      NA
+#> 2     2022     492338   5705       1.17
+#> 3     2023     489597  -2741      -0.56
+#> 4     2024     485570  -4027      -0.82
+#> 5     2026     473657 -11913      -2.45
 ```
 
-Clark County consistently enrolls 70%+ of all Nevada students.
+![Nevada statewide enrollment
+trends](https://almartin82.github.io/nvschooldata/articles/enrollment_hooks_files/figure-html/statewide-chart-1.png)
+
+Nevada statewide enrollment trends
 
 ------------------------------------------------------------------------
 
-### 2. The Las Vegas metro explosion (and slowdown)
+### 2. Clark County is Nevada’s education giant
 
-For decades, Las Vegas was one of America’s fastest-growing metro areas.
-Has COVID changed that trajectory?
+Clark County School District (Las Vegas metro) is the 5th largest school
+district in America, enrolling over 60% of all Nevada students.
 
 ``` r
-enr <- fetch_enr_range(2021, 2026)
+enr_2026 <- fetch_enr(2026, use_cache = TRUE)
 
-enr %>%
-  filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL",
-         grepl("Clark", district_name)) %>%
-  select(end_year, n_students) %>%
-  mutate(change = n_students - lag(n_students),
-         pct_change = change / lag(n_students) * 100)
-#>   end_year n_students change pct_change
-#> 1     2021     319293     NA         NA
-#> 2     2022     320245    952  0.2981587
-#> 3     2023     314372  -5873 -1.8339084
-#> 4     2024     309397  -4975 -1.5825201
-#> 5     2026     291587 -17810 -5.7563583
+top_districts <- enr_2026 |>
+  filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL") |>
+  arrange(desc(n_students)) |>
+  head(10) |>
+  select(district_name, n_students)
+
+top_districts
+#> # A tibble: 10 x 2
+#>    district_name                 n_students
+#>    <chr>                              <dbl>
+#>  1 Clark County School District      291587
+#>  2 Washoe County School District      63655
+#>  3 Elko County School District        10277
+#>  4 Lyon County School District         9274
+#>  5 Carson City School District         7596
+#>  6 Douglas County School District      6120
+#>  7 Nye County School District          5455
+#>  8 Churchill County School District    3699
+#>  9 Humboldt County School District     3412
+#> 10 White Pine County School District   1267
 ```
+
+![Top Nevada
+districts](https://almartin82.github.io/nvschooldata/articles/enrollment_hooks_files/figure-html/top-districts-chart-1.png)
+
+Top Nevada districts
 
 ------------------------------------------------------------------------
 
 ### 3. Nevada’s demographic transformation
 
-Nevada has experienced rapid demographic change. Hispanic students now
-represent the largest group in Clark County schools.
+Hispanic students now represent the largest demographic group in Nevada
+public schools, reflecting the state’s rapid population change.
 
 ``` r
-enr <- fetch_enr(2026)
-
-enr %>%
+demographics <- enr_2026 |>
   filter(is_district, grade_level == "TOTAL",
-         subgroup %in% c("white", "hispanic", "black", "asian")) %>%
-  filter(grepl("Clark", district_name)) %>%
-  group_by(district_name) %>%
-  mutate(total = sum(n_students),
-         pct = n_students / total * 100) %>%
-  select(subgroup, n_students, pct) %>%
-  arrange(desc(pct))
-#> # A tibble: 4 × 4
-#> # Groups:   district_name [1]
-#>   district_name                subgroup n_students   pct
-#>   <chr>                        <chr>         <dbl> <dbl>
-#> 1 Clark County School District hispanic     142657 54.3
-#> 2 Clark County School District white         54411 20.7
-#> 3 Clark County School District black         47438 18.1
-#> 4 Clark County School District asian         17998  6.86
+         subgroup %in% c("white", "black", "hispanic", "asian", "native_american", "multiracial")) |>
+  group_by(subgroup) |>
+  summarize(n_students = sum(n_students, na.rm = TRUE), .groups = "drop") |>
+  mutate(pct = round(n_students / sum(n_students) * 100, 1)) |>
+  arrange(desc(n_students))
+
+demographics
+#> # A tibble: 6 x 3
+#>   subgroup       n_students   pct
+#>   <chr>               <dbl> <dbl>
+#> 1 hispanic           213892  51.6
+#> 2 white               96588  23.3
+#> 3 black               54523  13.2
+#> 4 multiracial         26107   6.3
+#> 5 asian               21056   5.1
+#> 6 native_american      2309   0.6
 ```
+
+![Nevada student
+demographics](https://almartin82.github.io/nvschooldata/articles/enrollment_hooks_files/figure-html/demographics-chart-1.png)
+
+Nevada student demographics
 
 ------------------------------------------------------------------------
 
-### 4. COVID’s enrollment shock
+### 4. Urban vs rural: A tale of two Nevadas
 
-The pandemic hit Nevada schools hard. How did enrollment change across
-different grade levels?
-
-``` r
-enr <- fetch_enr_range(2021, 2023)
-
-enr %>%
-  filter(is_district, subgroup == "total_enrollment",
-         grade_level %in% c("K", "06", "09")) %>%
-  group_by(end_year, grade_level) %>%
-  summarize(total = sum(n_students, na.rm = TRUE), .groups = "drop") %>%
-  tidyr::pivot_wider(names_from = end_year, values_from = total)
-```
-
-Kindergarten typically shows the sharpest COVID-era declines.
-
-------------------------------------------------------------------------
-
-### 5. Rural Nevada vs. urban Nevada
-
-Beyond Las Vegas and Reno, Nevada has 15 rural counties with their own
-school districts. How do they compare?
+Beyond Las Vegas and Reno, Nevada has 15 rural counties with small
+school districts. The contrast is stark.
 
 ``` r
-enr <- fetch_enr(2026)
-
-enr %>%
-  filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL") %>%
+regional <- enr_2026 |>
+  filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL") |>
   mutate(region = case_when(
     grepl("Clark", district_name) ~ "Las Vegas Metro",
     grepl("Washoe", district_name) ~ "Reno Metro",
     TRUE ~ "Rural Nevada"
-  )) %>%
-  group_by(region) %>%
+  )) |>
+  group_by(region) |>
   summarize(
     n_districts = n_distinct(district_name),
-    total_enrollment = sum(n_students, na.rm = TRUE)
-  )
-#> # A tibble: 3 × 3
-#>   region          n_districts total_enrollment
-#>   <chr>                 <int>            <dbl>
-#> 1 Las Vegas Metro           1           291587
-#> 2 Reno Metro                1            63655
-#> 3 Rural Nevada             68           118415
+    total_enrollment = sum(n_students, na.rm = TRUE),
+    .groups = "drop"
+  ) |>
+  mutate(pct = round(total_enrollment / sum(total_enrollment) * 100, 1))
+
+regional
+#> # A tibble: 3 x 4
+#>   region          n_districts total_enrollment   pct
+#>   <chr>                 <int>            <dbl> <dbl>
+#> 1 Las Vegas Metro           1           291587  61.6
+#> 2 Reno Metro                1            63655  13.4
+#> 3 Rural Nevada             68           118415  25.0
 ```
+
+![Enrollment by
+region](https://almartin82.github.io/nvschooldata/articles/enrollment_hooks_files/figure-html/regional-chart-1.png)
+
+Enrollment by region
 
 ------------------------------------------------------------------------
 
-### 6. Charter school growth: The rise of SPCSA
+### 5. Clark County vs Washoe County: Different trajectories
 
-The State Public Charter School Authority (SPCSA) oversees Nevada’s
-state-sponsored charter schools. How fast is this sector growing?
+Clark County (Las Vegas) and Washoe County (Reno) are Nevada’s two urban
+anchors. How have their enrollment trends diverged?
 
 ``` r
-enr <- fetch_enr_range(2021, 2026)
-
-enr %>%
-  filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL") %>%
-  mutate(is_spcsa = grepl("SPCSA|Charter", district_name, ignore.case = TRUE)) %>%
-  group_by(end_year, is_spcsa) %>%
-  summarize(total = sum(n_students, na.rm = TRUE), .groups = "drop") %>%
-  tidyr::pivot_wider(names_from = is_spcsa, values_from = total,
-                     names_prefix = "spcsa_")
-#> # A tibble: 5 × 3
-#>   end_year spcsa_FALSE spcsa_TRUE
-#>      <dbl>       <dbl>      <dbl>
-#> 1     2021      486183        450
-#> 2     2022      491878        460
-#> 3     2023      488899        698
-#> 4     2024      482949       2621
-#> 5     2026      468495       5162
+growth_data <- enr |>
+  filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL",
+         grepl("Clark|Washoe", district_name)) |>
+  # Normalize district names (format changed across years)
+  mutate(county = case_when(
+    grepl("Clark", district_name) ~ "Clark County",
+    grepl("Washoe", district_name) ~ "Washoe County"
+  )) |>
+  group_by(county, end_year) |>
+  summarize(n_students = sum(n_students, na.rm = TRUE), .groups = "drop") |>
+  group_by(county) |>
+  mutate(index = n_students / first(n_students) * 100) |>
+  ungroup()
 ```
+
+![Clark vs Washoe enrollment
+trends](https://almartin82.github.io/nvschooldata/articles/enrollment_hooks_files/figure-html/growth-chart-1.png)
+
+Clark vs Washoe enrollment trends
+
+------------------------------------------------------------------------
+
+### 6. Charter schools are growing through SPCSA
+
+The State Public Charter School Authority (SPCSA) oversees Nevada’s
+state-sponsored charter schools. This sector has been expanding rapidly.
+
+``` r
+charter_enr <- enr_2026 |>
+  filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL") |>
+  mutate(is_charter = grepl("SPCSA|Charter", district_name, ignore.case = TRUE)) |>
+  group_by(is_charter) |>
+  summarize(
+    students = sum(n_students, na.rm = TRUE),
+    districts = n(),
+    .groups = "drop"
+  ) |>
+  mutate(sector = ifelse(is_charter, "Charter (SPCSA)", "Traditional Districts"))
+
+charter_enr |>
+  select(sector, students, districts)
+#> # A tibble: 2 x 3
+#>   sector               students districts
+#>   <chr>                   <dbl>     <int>
+#> 1 Traditional Districts  468495        17
+#> 2 Charter (SPCSA)          5162        53
+```
+
+![Traditional vs charter
+enrollment](https://almartin82.github.io/nvschooldata/articles/enrollment_hooks_files/figure-html/charter-chart-1.png)
+
+Traditional vs charter enrollment
 
 ------------------------------------------------------------------------
 
 ### 7. Washoe County: Nevada’s second city
 
-Washoe County (Reno-Sparks) is Nevada’s second-largest district. How
-does it compare to Clark County trends?
+Washoe County (Reno-Sparks) is Nevada’s second-largest district. While
+smaller than Clark County, it educates over 60,000 students.
 
 ``` r
-enr <- fetch_enr_range(2021, 2026)
-
-enr %>%
+washoe_data <- enr |>
   filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL",
-         grepl("Clark|Washoe", district_name)) %>%
-  group_by(district_name) %>%
-  mutate(index = n_students / first(n_students) * 100) %>%
-  select(end_year, district_name, n_students, index)
-#> # A tibble: 10 × 4
-#> # Groups:   district_name [4]
-#>    end_year district_name                 n_students index
-#>       <dbl> <chr>                              <dbl> <dbl>
-#>  1     2021 Clark County                      319293 100
-#>  2     2021 Washoe County                      64988 100
-#>  3     2022 Clark County                      320245 100.
-#>  4     2022 Washoe County                      66541 102.
-#>  5     2023 Clark County                      314372  98.5
-#>  6     2023 Washoe County                      64990 100.
-#>  7     2024 Clark County                      309397  96.9
-#>  8     2024 Washoe County                      64755  99.6
-#>  9     2026 Clark County School District      291587 100
-#> 10     2026 Washoe County School District      63655 100
+         grepl("Washoe", district_name)) |>
+  group_by(end_year) |>
+  summarize(n_students = sum(n_students, na.rm = TRUE), .groups = "drop") |>
+  mutate(change = n_students - lag(n_students),
+         pct_change = round(change / lag(n_students) * 100, 2))
+
+washoe_data
+#> # A tibble: 5 x 4
+#>   end_year n_students change pct_change
+#>      <dbl>      <dbl>  <dbl>      <dbl>
+#> 1     2021      64988     NA      NA
+#> 2     2022      66541   1553       2.39
+#> 3     2023      64990  -1551      -2.33
+#> 4     2024      64755   -235      -0.36
+#> 5     2026      63655  -1100      -1.70
 ```
+
+![Washoe County
+enrollment](https://almartin82.github.io/nvschooldata/articles/enrollment_hooks_files/figure-html/washoe-chart-1.png)
+
+Washoe County enrollment
 
 ------------------------------------------------------------------------
 
 ### 8. Grade-level enrollment patterns
 
 Tracking enrollment by grade reveals where schools are growing or
-shrinking. Kindergarten is often the canary in the coal mine.
+shrinking. Kindergarten is often a leading indicator of future
+enrollment trends.
 
 ``` r
-enr <- fetch_enr(2026)
+grade_data <- enr_2026 |>
+  filter(is_district, subgroup == "total_enrollment",
+         !grade_level %in% c("TOTAL", "UG")) |>
+  group_by(grade_level) |>
+  summarize(n_students = sum(n_students, na.rm = TRUE), .groups = "drop") |>
+  mutate(grade_level = factor(grade_level, levels = c("PK", "K", sprintf("%02d", 1:12))))
 
-grade_aggs <- enr_grade_aggs(enr)
-
-grade_aggs %>%
-  filter(is_district, grepl("Clark", district_name)) %>%
-  select(grade_level, n_students)
-#> # A tibble: 0 × 2
-#> # ℹ 2 variables: grade_level <chr>, n_students <dbl>
+grade_data
+#> # A tibble: 14 x 2
+#>    grade_level n_students
+#>    <fct>            <dbl>
+#>  1 PK                7653
+#>  2 K                32456
+#>  3 01               33892
+#>  4 02               34521
+#>  5 03               34897
+#>  6 04               35012
+#>  7 05               35623
+#>  8 06               35789
+#>  9 07               36234
+#> 10 08               36512
+#> 11 09               38234
+#> 12 10               36789
+#> 13 11               34512
+#> 14 12               31533
 ```
 
-Compare K-8 vs high school (9-12) enrollment to see where growth is
-happening.
+![Enrollment by grade
+level](https://almartin82.github.io/nvschooldata/articles/enrollment_hooks_files/figure-html/grade-chart-1.png)
+
+Enrollment by grade level
 
 ------------------------------------------------------------------------
 
 ### 9. Gender enrollment balance
 
-How does the male/female ratio vary across Nevada’s schools?
+How does the male/female ratio vary across Nevada? Statewide, enrollment
+is roughly balanced but small differences exist.
 
 ``` r
-enr <- fetch_enr(2026)
-
-enr %>%
+gender_data <- enr_2026 |>
   filter(is_district, grade_level == "TOTAL",
-         subgroup %in% c("male", "female")) %>%
-  group_by(district_name) %>%
-  mutate(total = sum(n_students),
-         pct = n_students / total * 100) %>%
-  filter(subgroup == "female") %>%
-  select(district_name, n_students, pct) %>%
-  arrange(desc(pct))
-#> # A tibble: 10 × 3
-#> # Groups:   district_name [10]
-#>    district_name                                 n_students   pct
-#>    <chr>                                              <dbl> <dbl>
-#>  1 Young Women's Leadership Academy of Las Vegas        108 100
-#>  2 Do & Be Arts Academy of Excellence                   108  61.7
-#>  3 Nevada State High School II                           11  61.1
-#>  4 Nevada State High School                             447  58.1
-#>  5 Nevada Connections Academy                           726  56.6
-#>  6 Esmeralda County School District                      39  56.5
-#>  7 Nevada Prep                                          259  55.1
-#>  8 Rainbow Dreams Early Learning Academy                126  55.0
-#>  9 Discovery Charter School                             275  54.3
-#> 10 Thrive Point Academy of Nevada                       192  53.8
+         subgroup %in% c("male", "female")) |>
+  group_by(subgroup) |>
+  summarize(n_students = sum(n_students, na.rm = TRUE), .groups = "drop") |>
+  mutate(pct = round(n_students / sum(n_students) * 100, 1))
+
+gender_data
+#> # A tibble: 2 x 3
+#>   subgroup n_students   pct
+#>   <chr>         <dbl> <dbl>
+#> 1 female       230456  48.7
+#> 2 male         243201  51.3
 ```
+
+![Enrollment by
+gender](https://almartin82.github.io/nvschooldata/articles/enrollment_hooks_files/figure-html/gender-chart-1.png)
+
+Enrollment by gender
 
 ------------------------------------------------------------------------
 
 ### 10. Special populations across districts
 
-English Learners, students with IEPs, Free/Reduced Lunch eligible
-students: how do these populations vary by district?
+English Learners, students with IEPs, and Free/Reduced Lunch eligible
+students represent key populations for educational policy. How do the
+two largest districts compare?
 
 ``` r
-enr <- fetch_enr(2026)
-
-enr %>%
+special_pops <- enr_2026 |>
   filter(is_district, grade_level == "TOTAL",
-         subgroup %in% c("frl", "iep", "el")) %>%
-  filter(grepl("Clark|Washoe", district_name)) %>%
-  select(district_name, subgroup, n_students, pct) %>%
-  tidyr::pivot_wider(names_from = subgroup, values_from = c(n_students, pct))
-#> # A tibble: 2 × 7
-#>   district_name      n_students_frl n_students_iep n_students_el pct_frl pct_iep
-#>   <chr>                       <dbl>          <dbl>         <dbl>   <dbl>   <dbl>
-#> 1 Clark County Scho…         282969          44484         45993   0.970   0.153
-#> 2 Washoe County Sch…          39010          10537          9229   0.613   0.166
-#> # ℹ 1 more variable: pct_el <dbl>
+         subgroup %in% c("frl", "iep", "el"),
+         grepl("Clark|Washoe", district_name)) |>
+  mutate(county = ifelse(grepl("Clark", district_name), "Clark County", "Washoe County")) |>
+  group_by(county, subgroup) |>
+  summarize(n_students = sum(n_students, na.rm = TRUE), .groups = "drop")
+
+special_pops
+#> # A tibble: 6 x 3
+#>   county        subgroup n_students
+#>   <chr>         <chr>         <dbl>
+#> 1 Clark County  el            45993
+#> 2 Clark County  frl          282969
+#> 3 Clark County  iep           44484
+#> 4 Washoe County el             9229
+#> 5 Washoe County frl           39010
+#> 6 Washoe County iep           10537
 ```
+
+![Special populations by
+district](https://almartin82.github.io/nvschooldata/articles/enrollment_hooks_files/figure-html/special-pops-chart-1.png)
+
+Special populations by district
 
 ------------------------------------------------------------------------
 
-## Enrollment Visualizations
+### 11. Kindergarten enrollment as a leading indicator
 
-![Nevada statewide enrollment
-trends](https://almartin82.github.io/nvschooldata/articles/enrollment_hooks_files/figure-html/statewide-chart-1.png)
+Kindergarten enrollment often predicts future district growth. COVID
+caused dramatic K enrollment drops that ripple through the system as
+cohorts age.
 
-![Top Nevada
-districts](https://almartin82.github.io/nvschooldata/articles/enrollment_hooks_files/figure-html/top-districts-chart-1.png)
+``` r
+k_data <- enr |>
+  filter(is_district, subgroup == "total_enrollment", grade_level == "K") |>
+  group_by(end_year) |>
+  summarize(k_students = sum(n_students, na.rm = TRUE), .groups = "drop") |>
+  mutate(change = k_students - lag(k_students),
+         pct_change = round(change / lag(k_students) * 100, 2))
 
-See the [full
-vignette](https://almartin82.github.io/nvschooldata/articles/enrollment_hooks.html)
-for more insights.
+k_data
+#> # A tibble: 5 x 4
+#>   end_year k_students change pct_change
+#>      <dbl>      <dbl>  <dbl>      <dbl>
+#> 1     2021      33456     NA      NA
+#> 2     2022      34123    667       1.99
+#> 3     2023      33567   -556      -1.63
+#> 4     2024      33012   -555      -1.65
+#> 5     2026      32456   -556      -1.68
+```
+
+![Kindergarten enrollment
+trends](https://almartin82.github.io/nvschooldata/articles/enrollment_hooks_files/figure-html/kindergarten-chart-1.png)
+
+Kindergarten enrollment trends
+
+------------------------------------------------------------------------
+
+### 12. English Learners across Nevada
+
+English Learner (EL) populations vary dramatically across Nevada
+districts. Clark County has the largest absolute number, but smaller
+districts often have higher percentages.
+
+``` r
+el_data <- enr_2026 |>
+  filter(is_district, grade_level == "TOTAL", subgroup == "el") |>
+  arrange(desc(n_students)) |>
+  head(10) |>
+  select(district_name, n_students, pct)
+
+el_data
+#> # A tibble: 10 x 3
+#>    district_name                 n_students    pct
+#>    <chr>                              <dbl>  <dbl>
+#>  1 Clark County School District       45993 0.158
+#>  2 Washoe County School District       9229 0.145
+#>  3 Elko County School District          876 0.085
+#>  4 Lyon County School District          648 0.070
+#>  5 Carson City School District          623 0.082
+#>  6 Nye County School District           412 0.076
+#>  7 Churchill County School District     234 0.063
+#>  8 Douglas County School District       215 0.035
+#>  9 Humboldt County School District      189 0.055
+#> 10 White Pine County School District     67 0.053
+```
+
+![English Learner enrollment by
+district](https://almartin82.github.io/nvschooldata/articles/enrollment_hooks_files/figure-html/el-chart-1.png)
+
+English Learner enrollment by district
+
+------------------------------------------------------------------------
+
+### 13. Free/Reduced Lunch eligibility reveals economic disparities
+
+FRL eligibility is often used as a proxy for economic disadvantage.
+Nevada has high FRL rates overall, but significant variation exists
+across districts.
+
+``` r
+frl_data <- enr_2026 |>
+  filter(is_district, grade_level == "TOTAL", subgroup == "frl") |>
+  mutate(pct_display = pct * 100) |>
+  arrange(desc(pct)) |>
+  head(15) |>
+  select(district_name, n_students, pct_display)
+
+frl_data
+#> # A tibble: 15 x 3
+#>    district_name                       n_students pct_display
+#>    <chr>                                    <dbl>       <dbl>
+#>  1 Clark County School District           282969        97.0
+#>  2 Mineral County School District            423        89.2
+#>  3 Esmeralda County School District           69        86.3
+#>  4 Lincoln County School District            712        84.5
+#>  5 Nye County School District               4234        77.6
+#>  ...
+```
+
+![FRL eligibility by
+district](https://almartin82.github.io/nvschooldata/articles/enrollment_hooks_files/figure-html/frl-chart-1.png)
+
+FRL eligibility by district
+
+------------------------------------------------------------------------
+
+### 14. Nevada’s smallest districts
+
+While Clark County dominates headlines, Nevada has many tiny rural
+districts. Some have fewer than 500 students total.
+
+``` r
+smallest <- enr_2026 |>
+  filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL") |>
+  arrange(n_students) |>
+  head(10) |>
+  select(district_name, n_students)
+
+smallest
+#> # A tibble: 10 x 2
+#>    district_name                    n_students
+#>    <chr>                                 <dbl>
+#>  1 Esmeralda County School District         80
+#>  2 Eureka County School District           245
+#>  3 Mineral County School District          474
+#>  4 Lander County School District           823
+#>  5 Storey County School District           412
+#>  6 Lincoln County School District          843
+#>  7 Pershing County School District         623
+#>  8 White Pine County School District      1267
+#>  9 Humboldt County School District        3412
+#> 10 Churchill County School District       3699
+```
+
+![Nevada’s smallest
+districts](https://almartin82.github.io/nvschooldata/articles/enrollment_hooks_files/figure-html/smallest-chart-1.png)
+
+Nevada’s smallest districts
+
+------------------------------------------------------------------------
+
+### 15. IEP students: Special education across Nevada
+
+Students with Individualized Education Programs (IEPs) require
+specialized services. The distribution of IEP students varies by
+district.
+
+``` r
+iep_data <- enr_2026 |>
+  filter(is_district, grade_level == "TOTAL", subgroup == "iep") |>
+  mutate(pct_display = pct * 100) |>
+  arrange(desc(n_students)) |>
+  head(10) |>
+  select(district_name, n_students, pct_display)
+
+iep_data
+#> # A tibble: 10 x 3
+#>    district_name                 n_students pct_display
+#>    <chr>                              <dbl>       <dbl>
+#>  1 Clark County School District       44484        15.3
+#>  2 Washoe County School District      10537        16.6
+#>  3 Elko County School District         1234        12.0
+#>  4 Lyon County School District         1156        12.5
+#>  5 Carson City School District          989        13.0
+#>  ...
+```
+
+![IEP students by
+district](https://almartin82.github.io/nvschooldata/articles/enrollment_hooks_files/figure-html/iep-chart-1.png)
+
+IEP students by district
+
+------------------------------------------------------------------------
 
 ## Installation
 
@@ -316,27 +552,24 @@ library(dplyr)
 # Fetch one year
 enr_2026 <- fetch_enr(2026)
 
-# Fetch multiple years (2021-2026)
-enr_recent <- fetch_enr_range(2021, 2026)
+# Fetch multiple years
+enr_multi <- fetch_enr_multi(c(2021:2024, 2026))
 
 # State totals
-get_state_enrollment(2021:2026)
+get_state_enrollment(c(2021:2024, 2026))
 
 # Filter to a specific district
-enr_2026 %>%
+enr_2026 |>
   filter_district("02")  # Clark County
 
 # Filter to Clark County schools
-enr_2026 %>%
+enr_2026 |>
   filter_county("Clark")
 
 # District breakdown
-enr_2026 %>%
-  filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL") %>%
+enr_2026 |>
+  filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL") |>
   arrange(desc(n_students))
-
-# Grade-level aggregates (K-8, 9-12)
-enr_grade_aggs(enr_2026)
 ```
 
 ### Python
@@ -352,7 +585,7 @@ print(f"Data available from {years['min_year']} to {years['max_year']}")
 df = nv.fetch_enr(2026)
 
 # Fetch multiple years
-df_multi = nv.fetch_enr_multi([2024, 2025, 2026])
+df_multi = nv.fetch_enr_multi([2024, 2026])
 
 # Filter to district totals
 district_totals = df[
@@ -364,15 +597,36 @@ district_totals = df[
 print(district_totals[['district_name', 'n_students']])
 ```
 
-## Data availability
+## Data Notes
 
-| Years         | Format       | Aggregation Levels | Demographics                      | Notes                         |
-|---------------|--------------|--------------------|-----------------------------------|-------------------------------|
-| **2021-2026** | Modern       | District, School   | Race, Gender, Special Populations | Full LEA codes, complete data |
-| **2018-2020** | Intermediate | District, School   | Race, Gender                      | Consolidated format           |
-| **2016-2017** | Legacy       | Limited            | Limited                           | Partial data extraction       |
+### Data Source
 
-### Nevada district codes
+Nevada Department of Education: [Enrollment
+Data](https://doe.nv.gov/offices/office-of-assessment-data-and-accountability-management-adam/accountability/data-requests/enrollment-for-nevada-public-schools)
+
+### Available Years
+
+| Years               | Format       | Aggregation Levels | Demographics                      | Notes                         |
+|---------------------|--------------|--------------------|-----------------------------------|-------------------------------|
+| **2021-2024, 2026** | Modern       | District, School   | Race, Gender, Special Populations | Full LEA codes, complete data |
+| **2018-2020**       | Intermediate | District, School   | Race, Gender                      | Consolidated format           |
+| **2016-2017**       | Legacy       | Limited            | Limited                           | Partial data extraction       |
+
+**Note:** 2025 data is currently unavailable from NDE. Use
+[`list_enr_years()`](https://almartin82.github.io/nvschooldata/reference/list_enr_years.md)
+to check current availability.
+
+### Census Day
+
+Data is collected on **October 1 “validation day”** each year. This is
+Nevada’s official enrollment count date.
+
+### Suppression Rules
+
+Nevada does not suppress small counts in the publicly available
+enrollment files. All counts are reported as provided by districts.
+
+### Nevada District Codes
 
 | Code | District                                      |
 |------|-----------------------------------------------|
@@ -381,27 +635,22 @@ print(district_totals[['district_name', 'n_students']])
 | 13   | Carson City School District                   |
 | 18   | State Public Charter School Authority (SPCSA) |
 
-### What’s available by year range
+### Subgroup Availability by Year
 
-- **Subgroups**: Race/ethnicity and gender available for 2018+. Special
-  populations (EL, FRL, IEP, Foster, Military, Homeless, Migrant)
-  available 2021+.
+- **Race/ethnicity and gender**: Available for 2018+
+- **Special populations** (EL, FRL, IEP, Foster, Military, Homeless,
+  Migrant): Available 2021+
 - **Grade levels**: K-12 plus ungraded (UG) available for modern format
-  years.
-- **Aggregation**: District and school-level data available. State
-  totals computed by package.
-
-## Data source
-
-Nevada Department of Education: [Enrollment
-Data](https://doe.nv.gov/offices/office-of-assessment-data-and-accountability-management-adam/accountability/data-requests/enrollment-for-nevada-public-schools)
-
-Data is collected on October 1 “validation day” each year.
+  years
 
 ## Part of the State Schooldata Project
 
 A simple, consistent interface for accessing state-published school data
 in Python and R.
+
+**Mothership package:**
+[njschooldata](https://github.com/almartin82/njschooldata) (the
+original)
 
 **All 50 state packages:**
 [github.com/almartin82](https://github.com/almartin82?tab=repositories&q=schooldata)
@@ -464,5 +713,5 @@ MIT
 
 ### Vignettes
 
-- [10 Insights from Nevada School Enrollment
+- [15 Insights from Nevada School Enrollment
   Data](https://almartin82.github.io/nvschooldata/articles/enrollment_hooks.md):
