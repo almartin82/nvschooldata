@@ -756,7 +756,7 @@ sessionInfo()
 #> [13] labeling_0.4.3     generics_0.1.4     knitr_1.51         forcats_1.0.1     
 #> [17] tibble_3.3.1       desc_1.4.3         downloader_0.4.1   bslib_0.9.0       
 #> [21] pillar_1.11.1      RColorBrewer_1.1-3 rlang_1.1.7        utf8_1.2.6        
-#> [25] cachem_1.1.0       xfun_0.55          S7_0.2.1           fs_1.6.6          
+#> [25] cachem_1.1.0       xfun_0.56          S7_0.2.1           fs_1.6.6          
 #> [29] sass_0.4.10        viridisLite_0.4.2  cli_3.6.5          withr_3.0.2       
 #> [33] pkgdown_2.2.0      magrittr_2.0.4     digest_0.6.39      grid_4.5.2        
 #> [37] rappdirs_0.3.4     lifecycle_1.0.5    vctrs_0.7.0        evaluate_1.0.5    
