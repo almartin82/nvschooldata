@@ -209,7 +209,7 @@ school districts. The contrast is stark.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">regional</span> <span class="op">&lt;-</span> <span class="va">enr_2026</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"total_enrollment"</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>region <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>region <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"Clark"</span>, <span class="va">district_name</span><span class="op">)</span> <span class="op">~</span> <span class="st">"Las Vegas Metro"</span>,</span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"Washoe"</span>, <span class="va">district_name</span><span class="op">)</span> <span class="op">~</span> <span class="st">"Reno Metro"</span>,</span>
 <span>    <span class="cn">TRUE</span> <span class="op">~</span> <span class="st">"Rural Nevada"</span></span>
@@ -257,7 +257,7 @@ urban anchors. How have their enrollment trends diverged?</p>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"total_enrollment"</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span>,</span>
 <span>         <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"Clark|Washoe"</span>, <span class="va">district_name</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="co"># Normalize district names (format changed across years)</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>county <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>county <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"Clark"</span>, <span class="va">district_name</span><span class="op">)</span> <span class="op">~</span> <span class="st">"Clark County"</span>,</span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"Washoe"</span>, <span class="va">district_name</span><span class="op">)</span> <span class="op">~</span> <span class="st">"Washoe County"</span></span>
 <span>  <span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -738,7 +738,7 @@ Data</a>.</em></p>
 <span><span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; other attached packages:</span></span>
-<span><span class="co">#&gt; [1] ggplot2_4.0.1      tidyr_1.3.2        dplyr_1.1.4        nvschooldata_0.1.0</span></span>
+<span><span class="co">#&gt; [1] ggplot2_4.0.2      tidyr_1.3.2        dplyr_1.2.0        nvschooldata_0.1.0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
 <span><span class="co">#&gt;  [1] gtable_0.3.6       jsonlite_2.0.0     compiler_4.5.2     tidyselect_1.2.1  </span></span>
@@ -748,7 +748,7 @@ Data</a>.</em></p>
 <span><span class="co">#&gt; [17] tibble_3.3.1       desc_1.4.3         downloader_0.4.1   bslib_0.10.0      </span></span>
 <span><span class="co">#&gt; [21] pillar_1.11.1      RColorBrewer_1.1-3 rlang_1.1.7        utf8_1.2.6        </span></span>
 <span><span class="co">#&gt; [25] cachem_1.1.0       xfun_0.56          S7_0.2.1           fs_1.6.6          </span></span>
-<span><span class="co">#&gt; [29] sass_0.4.10        viridisLite_0.4.2  cli_3.6.5          withr_3.0.2       </span></span>
+<span><span class="co">#&gt; [29] sass_0.4.10        viridisLite_0.4.3  cli_3.6.5          withr_3.0.2       </span></span>
 <span><span class="co">#&gt; [33] pkgdown_2.2.0      magrittr_2.0.4     digest_0.6.39      grid_4.5.2        </span></span>
 <span><span class="co">#&gt; [37] rappdirs_0.3.4     lifecycle_1.0.5    vctrs_0.7.1        evaluate_1.0.5    </span></span>
 <span><span class="co">#&gt; [41] glue_1.8.0         cellranger_1.1.0   farver_2.1.2       codetools_0.2-20  </span></span>
