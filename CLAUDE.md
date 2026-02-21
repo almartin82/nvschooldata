@@ -119,6 +119,27 @@ If CI fails, fix the issue and push - auto-merge triggers when checks pass.
 
 ---
 
+## Valid Filter Values (tidy enrollment via `fetch_enr(tidy = TRUE)`)
+
+### subgroup
+`total_enrollment`, `white`, `black`, `hispanic`, `asian`, `native_american`, `pacific_islander`, `multiracial`, `female`, `male`, `frl`, `iep`, `el`, `migrant`, `foster`, `military`, `homeless`
+
+**NOT in tidy enrollment:** Special populations (`frl`, `iep`, `el`, `migrant`, `foster`, `military`, `homeless`) are only available in modern format years (2021+). Legacy/intermediate formats have limited special population data.
+
+### grade_level
+`PK`, `K`, `01`-`12`, `UG`, `AD`, `TOTAL`
+
+Grade aggregates from `enr_grade_aggs()`: `K8`, `HS`, `K12`
+
+**Common trap:** Raw data uses various grade formats (`KG`, `KINDERGARTEN`, `0K`, `13` for ungraded). `standardize_grade()` normalizes these: `KG`/`KINDERGARTEN`/`0K` -> `K`, `PK`/`PRE-K`/`PREK` -> `PK`, `13`/`UNGRADED` -> `UG`. Always filter on the normalized values. Note: Nevada data has grade_level as an invariant column (already per-grade rows), not pivoted from wide columns.
+
+### entity flags
+`is_state`, `is_district`, `is_school`, `is_charter`
+
+`is_charter` is detected by matching `Charter` or `SPCSA` in `lea_name` or `district_name`.
+
+---
+
 ## README Images from Vignettes (REQUIRED)
 
 **NEVER use `man/figures/` or `generate_readme_figs.R` for README images.**
