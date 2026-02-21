@@ -44,7 +44,7 @@ tidy_enr <- function(df) {
 
   # Special population subgroups
   special_cols <- c(
-    "frl", "iep", "el", "migrant", "foster", "military", "homeless"
+    "free_reduced_lunch", "special_ed", "lep", "migrant", "foster", "military", "homeless"
   )
   special_cols <- special_cols[special_cols %in% names(df)]
 
