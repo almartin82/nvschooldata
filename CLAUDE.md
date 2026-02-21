@@ -135,12 +135,16 @@ pass.
 
 `total_enrollment`, `white`, `black`, `hispanic`, `asian`,
 `native_american`, `pacific_islander`, `multiracial`, `female`, `male`,
-`frl`, `iep`, `el`, `migrant`, `foster`, `military`, `homeless`
+`free_reduced_lunch`, `special_ed`, `lep`, `migrant`, `foster`,
+`military`, `homeless`
 
-**NOT in tidy enrollment:** Special populations (`frl`, `iep`, `el`,
-`migrant`, `foster`, `military`, `homeless`) are only available in
-modern format years (2021+). Legacy/intermediate formats have limited
-special population data.
+**NOT in tidy enrollment:** Special populations (`free_reduced_lunch`,
+`special_ed`, `lep`, `migrant`, `foster`, `military`, `homeless`) are
+only available in modern format years (2021+). Legacy/intermediate
+formats have limited special population data.
+
+**Note:** `frl` renamed to `free_reduced_lunch`, `iep` renamed to
+`special_ed`, `el` renamed to `lep` for cross-state consistency.
 
 ### grade_level
 

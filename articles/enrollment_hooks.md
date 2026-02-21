@@ -421,15 +421,8 @@ special_pops <- enr_2026 |>
   summarize(n_students = sum(n_students, na.rm = TRUE), .groups = "drop")
 
 special_pops
-#> # A tibble: 6 × 3
-#>   county        subgroup n_students
-#>   <chr>         <chr>         <dbl>
-#> 1 Clark County  el            45993
-#> 2 Clark County  frl          282969
-#> 3 Clark County  iep           44484
-#> 4 Washoe County el             9229
-#> 5 Washoe County frl           39010
-#> 6 Washoe County iep           10537
+#> # A tibble: 0 × 3
+#> # ℹ 3 variables: county <lgl>, subgroup <chr>, n_students <dbl>
 ```
 
 ``` r
@@ -519,17 +512,8 @@ el_data <- enr_2026 |>
   select(district_name, n_students, pct)
 
 el_data
-#>                    district_name n_students        pct
-#> 1   Clark County School District      45993 0.15773337
-#> 2  Washoe County School District       9229 0.14498468
-#> 3        Mater Academy of Nevada       1816 0.34283557
-#> 4    Carson City School District        916 0.12580689
-#> 5    Elko County School District        774 0.08328850
-#> 6    Lyon County School District        637 0.07030905
-#> 7     Nye County School District        449 0.07749396
-#> 8  Somerset Academy of Las Vegas        405 0.04247955
-#> 9                 CIVICA Academy        403 0.28044537
-#> 10                Equipo Academy        365 0.38461538
+#> [1] district_name n_students    pct          
+#> <0 rows> (or 0-length row.names)
 ```
 
 ``` r
@@ -568,22 +552,8 @@ frl_data <- enr_2026 |>
   select(district_name, n_students, pct_display)
 
 frl_data
-#>                               district_name n_students pct_display
-#> 1          Esmeralda County School District         69         100
-#> 2           Pershing County School District        647         100
-#> 3                            Futuro Academy        484         100
-#> 4          Mater Academy of Northern Nevada        514         100
-#> 5                            Democracy Prep        927         100
-#> 6  Sports Leadership and Management Academy       1988         100
-#> 7                            Equipo Academy        949         100
-#> 8                   Mater Academy of Nevada       5297         100
-#> 9     Rainbow Dreams Early Learning Academy        229         100
-#> 10                        The Delta Academy       1315         100
-#> 11 Innovations International Charter School        619         100
-#> 12                            Quest Academy        415         100
-#> 13                        FuturEdge Academy        318         100
-#> 14       Southern Nevada Trades High School        250         100
-#> 15                      Vegas Vista Academy        270         100
+#> [1] district_name n_students    pct_display  
+#> <0 rows> (or 0-length row.names)
 ```
 
 ``` r
@@ -666,17 +636,8 @@ iep_data <- enr_2026 |>
   select(district_name, n_students, pct_display)
 
 iep_data
-#>                     district_name n_students pct_display
-#> 1    Clark County School District      44484   15.255824
-#> 2   Washoe County School District      10537   16.553295
-#> 3     Lyon County School District       1541   17.008830
-#> 4   Somerset Academy of Las Vegas       1258   13.194881
-#> 5     Elko County School District       1238   13.321855
-#> 6     Carson City School District        943   12.951518
-#> 7      Nye County School District        882   15.222644
-#> 8     Pinecrest Academy of Nevada        840    9.912674
-#> 9  Douglas County School District        692   14.583772
-#> 10                  Doral Academy        674   10.462589
+#> [1] district_name n_students    pct_display  
+#> <0 rows> (or 0-length row.names)
 ```
 
 ``` r
