@@ -122,9 +122,11 @@ If CI fails, fix the issue and push - auto-merge triggers when checks pass.
 ## Valid Filter Values (tidy enrollment via `fetch_enr(tidy = TRUE)`)
 
 ### subgroup
-`total_enrollment`, `white`, `black`, `hispanic`, `asian`, `native_american`, `pacific_islander`, `multiracial`, `female`, `male`, `frl`, `iep`, `el`, `migrant`, `foster`, `military`, `homeless`
+`total_enrollment`, `white`, `black`, `hispanic`, `asian`, `native_american`, `pacific_islander`, `multiracial`, `female`, `male`, `free_reduced_lunch`, `special_ed`, `lep`, `migrant`, `foster`, `military`, `homeless`
 
-**NOT in tidy enrollment:** Special populations (`frl`, `iep`, `el`, `migrant`, `foster`, `military`, `homeless`) are only available in modern format years (2021+). Legacy/intermediate formats have limited special population data.
+**NOT in tidy enrollment:** Special populations (`free_reduced_lunch`, `special_ed`, `lep`, `migrant`, `foster`, `military`, `homeless`) are only available in modern format years (2021+). Legacy/intermediate formats have limited special population data.
+
+**Note:** `frl` renamed to `free_reduced_lunch`, `iep` renamed to `special_ed`, `el` renamed to `lep` for cross-state consistency.
 
 ### grade_level
 `PK`, `K`, `01`-`12`, `UG`, `AD`, `TOTAL`
