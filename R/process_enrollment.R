@@ -202,9 +202,9 @@ process_school_totals <- function(df, end_year) {
   # === SPECIAL POPULATIONS ===
 
   special_map <- list(
-    "frl" = "^FRL$",
-    "iep" = "^IEP$",
-    "el" = "^EL$",
+    "free_reduced_lunch" = "^FRL$",
+    "special_ed" = "^IEP$",
+    "lep" = "^EL$",
     "migrant" = "^MIG$|^Migrant$",
     "foster" = "^Foster$",
     "military" = "^Military$",
@@ -415,9 +415,9 @@ process_district_data <- function(df, end_year) {
 
   # Special populations
   special_map <- list(
-    "frl" = "^FRL$",
-    "iep" = "^IEP$",
-    "el" = "^EL$",
+    "free_reduced_lunch" = "^FRL$",
+    "special_ed" = "^IEP$",
+    "lep" = "^EL$",
     "migrant" = "^MIG$|^Migrant$",
     "foster" = "^Foster$",
     "military" = "^Military$",
