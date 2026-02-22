@@ -47,6 +47,7 @@ state_totals <- enr |>
   mutate(change = n_students - lag(n_students),
          pct_change = round(change / lag(n_students) * 100, 2))
 
+stopifnot(nrow(state_totals) > 0)
 state_totals
 ```
 
@@ -67,7 +68,7 @@ ggplot(state_totals, aes(x = end_year, y = n_students)) +
 
 ## 2. Clark County is Nevada's education giant
 
-Clark County School District (Las Vegas metro) is the 5th largest school district in America, enrolling more than 70% of all Nevada students.
+Clark County School District (Las Vegas metro) is the 5th largest school district in America. Charter networks like Somerset Academy and Pinecrest also rank among the state's largest entities.
 
 ```{r top-districts}
 enr_2026 <- fetch_enr(2026, use_cache = TRUE)
@@ -78,6 +79,7 @@ top_districts <- enr_2026 |>
   head(10) |>
   select(district_name, n_students)
 
+stopifnot(nrow(top_districts) > 0)
 top_districts
 ```
 
@@ -101,7 +103,7 @@ top_districts |>
 
 ## 3. Nevada's demographic transformation
 
-Hispanic students now represent the largest demographic group in Nevada public schools, reflecting the state's rapid population change.
+Hispanic students now represent the largest demographic group in Nevada public schools at 46.5%, reflecting the state's rapid population change.
 
 ```{r demographics}
 demographics <- enr_2026 |>
@@ -112,6 +114,7 @@ demographics <- enr_2026 |>
   mutate(pct = round(n_students / sum(n_students) * 100, 1)) |>
   arrange(desc(n_students))
 
+stopifnot(nrow(demographics) > 0)
 demographics
 ```
 
@@ -135,7 +138,7 @@ demographics |>
 
 ## 4. Urban vs rural: A tale of two Nevadas
 
-Beyond Las Vegas and Reno, Nevada has 15 rural counties with small school districts. The contrast is stark.
+Beyond Las Vegas and Reno, Nevada has dozens of entities classified as districts, including charter schools. The enrollment contrast is stark.
 
 ```{r regional}
 regional <- enr_2026 |>
@@ -153,6 +156,7 @@ regional <- enr_2026 |>
   ) |>
   mutate(pct = round(total_enrollment / sum(total_enrollment) * 100, 1))
 
+stopifnot(nrow(regional) > 0)
 regional
 ```
 
@@ -177,9 +181,9 @@ regional |>
 
 ## 5. Clark County vs Washoe County: Different trajectories
 
-Clark County (Las Vegas) and Washoe County (Reno) are Nevada's two urban anchors. How have their enrollment trends diverged?
+Clark County (Las Vegas) and Washoe County (Reno) are Nevada's two urban anchors. Clark has lost 8.7% of enrollment since 2021 while Washoe has been more stable, declining only 2.1%.
 
-```{r growth-chart}
+```{r growth-data}
 growth_data <- enr |>
   filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL",
          grepl("Clark|Washoe", district_name)) |>
@@ -191,9 +195,14 @@ growth_data <- enr |>
   group_by(county, end_year) |>
   summarize(n_students = sum(n_students, na.rm = TRUE), .groups = "drop") |>
   group_by(county) |>
-  mutate(index = n_students / first(n_students) * 100) |>
+  mutate(index = round(n_students / first(n_students) * 100, 1)) |>
   ungroup()
 
+stopifnot(nrow(growth_data) > 0)
+growth_data
+```
+
+```{r growth-chart}
 ggplot(growth_data, aes(x = end_year, y = index, color = county)) +
   geom_line(linewidth = 1.2) +
   geom_point(size = 2) +
@@ -210,14 +219,13 @@ ggplot(growth_data, aes(x = end_year, y = index, color = county)) +
 
 ---
 
-## 6. Charter schools are growing through SPCSA
+## 6. Nearly 15% of Nevada students attend charter schools
 
-The State Public Charter School Authority (SPCSA) oversees Nevada's state-sponsored charter schools. This sector has been expanding rapidly.
+Nevada's charter sector has grown significantly. Using the package's `is_charter` flag, 51 charter entities enroll over 70,000 students -- nearly 15% of all public school enrollment.
 
 ```{r charters}
 charter_enr <- enr_2026 |>
   filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL") |>
-  mutate(is_charter = grepl("SPCSA|Charter", district_name, ignore.case = TRUE)) |>
   group_by(is_charter) |>
   summarize(
     students = sum(n_students, na.rm = TRUE),
@@ -226,6 +234,7 @@ charter_enr <- enr_2026 |>
   ) |>
   mutate(sector = ifelse(is_charter, "Charter (SPCSA)", "Traditional Districts"))
 
+stopifnot(nrow(charter_enr) > 0)
 charter_enr |>
   select(sector, students, districts)
 ```
@@ -239,7 +248,7 @@ charter_enr |>
   scale_fill_manual(values = c("Charter (SPCSA)" = "#E67300", "Traditional Districts" = "#003366")) +
   labs(
     title = "Traditional vs Charter School Enrollment (2026)",
-    subtitle = "SPCSA manages Nevada's state-sponsored charter sector",
+    subtitle = "Charter schools enroll nearly 15% of Nevada students",
     x = NULL,
     y = "Number of Students"
   )
@@ -260,6 +269,7 @@ washoe_data <- enr |>
   mutate(change = n_students - lag(n_students),
          pct_change = round(change / lag(n_students) * 100, 2))
 
+stopifnot(nrow(washoe_data) > 0)
 washoe_data
 ```
 
@@ -280,16 +290,17 @@ ggplot(washoe_data, aes(x = end_year, y = n_students)) +
 
 ## 8. Grade-level enrollment patterns
 
-Tracking enrollment by grade reveals where schools are growing or shrinking. Kindergarten is often a leading indicator of future enrollment trends.
+Tracking enrollment by grade reveals where schools are growing or shrinking. Grade-level breakdowns are available at the school level; district rows report only totals.
 
 ```{r grade-levels}
 grade_data <- enr_2026 |>
-  filter(is_district, subgroup == "total_enrollment",
-         !grade_level %in% c("TOTAL", "UG")) |>
+  filter(is_school, subgroup == "total_enrollment",
+         !grade_level %in% c("TOTAL", "UG", "AD")) |>
   group_by(grade_level) |>
   summarize(n_students = sum(n_students, na.rm = TRUE), .groups = "drop") |>
   mutate(grade_level = factor(grade_level, levels = c("PK", "K", sprintf("%02d", 1:12))))
 
+stopifnot(nrow(grade_data) > 0)
 grade_data
 ```
 
@@ -300,7 +311,7 @@ ggplot(grade_data, aes(x = grade_level, y = n_students, fill = grade_level)) +
   scale_fill_viridis_d(option = "viridis") +
   labs(
     title = "Nevada Enrollment by Grade Level (2026)",
-    subtitle = "Distribution across K-12 grades",
+    subtitle = "Distribution across PK-12 grades (school-level aggregation)",
     x = "Grade Level",
     y = "Number of Students"
   )
@@ -320,6 +331,7 @@ gender_data <- enr_2026 |>
   summarize(n_students = sum(n_students, na.rm = TRUE), .groups = "drop") |>
   mutate(pct = round(n_students / sum(n_students) * 100, 1))
 
+stopifnot(nrow(gender_data) > 0)
 gender_data
 ```
 
@@ -353,6 +365,7 @@ special_pops <- enr_2026 |>
   group_by(county, subgroup) |>
   summarize(n_students = sum(n_students, na.rm = TRUE), .groups = "drop")
 
+stopifnot(nrow(special_pops) > 0)
 special_pops
 ```
 
@@ -378,10 +391,10 @@ ggplot(special_pops, aes(x = subgroup, y = n_students, fill = county)) +
 ## Summary
 
 Nevada's school enrollment data reveals:
-- **Clark County dominance**: Over 70% of students are in the Las Vegas metro
-- **Demographic shift**: Hispanic students are now the largest demographic group
-- **Urban-rural divide**: Rural Nevada has 15 districts but a tiny fraction of students
-- **Charter growth**: SPCSA schools are expanding their share of enrollment
+- **Clark County dominance**: Over 60% of students are in the Las Vegas metro
+- **Demographic shift**: Hispanic students are now the largest demographic group at 46.5%
+- **Urban-rural divide**: Rural Nevada has many districts but a fraction of students
+- **Charter growth**: 51 charter entities enroll nearly 15% of Nevada students
 - **Stabilization**: After decades of growth, enrollment has plateaued
 
 These patterns shape school funding debates and facility planning across the Silver State.
@@ -390,16 +403,17 @@ These patterns shape school funding debates and facility planning across the Sil
 
 ## 11. Kindergarten enrollment as a leading indicator
 
-Kindergarten enrollment often predicts future district growth. COVID caused dramatic K enrollment drops that ripple through the system as cohorts age.
+Kindergarten enrollment often predicts future trends. School-level data shows K enrollment dipped to 28,931 in 2024 before recovering to 30,490 in 2026.
 
 ```{r kindergarten}
 k_data <- enr |>
-  filter(is_district, subgroup == "total_enrollment", grade_level == "K") |>
+  filter(is_school, subgroup == "total_enrollment", grade_level == "K") |>
   group_by(end_year) |>
   summarize(k_students = sum(n_students, na.rm = TRUE), .groups = "drop") |>
   mutate(change = k_students - lag(k_students),
          pct_change = round(change / lag(k_students) * 100, 2))
 
+stopifnot(nrow(k_data) > 0)
 k_data
 ```
 
@@ -420,7 +434,7 @@ ggplot(k_data, aes(x = end_year, y = k_students)) +
 
 ## 12. English Learners across Nevada
 
-English Learner (EL) populations vary dramatically across Nevada districts. Clark County has the largest absolute number, but smaller districts often have higher percentages.
+English Learner (EL) populations vary dramatically across Nevada's districts and charter schools. Clark County has the largest absolute number, but charter schools like Mater Academy have higher EL percentages.
 
 ```{r el-district}
 el_data <- enr_2026 |>
@@ -429,6 +443,7 @@ el_data <- enr_2026 |>
   head(10) |>
   select(district_name, n_students, pct)
 
+stopifnot(nrow(el_data) > 0)
 el_data
 ```
 
@@ -453,7 +468,7 @@ el_data |>
 
 ## 13. Free/Reduced Lunch eligibility reveals economic disparities
 
-FRL eligibility is often used as a proxy for economic disadvantage. Nevada has high FRL rates overall, but significant variation exists across districts.
+FRL eligibility is often used as a proxy for economic disadvantage. Many charter schools report 100% FRL eligibility, while traditional county districts vary widely.
 
 ```{r frl}
 frl_data <- enr_2026 |>
@@ -463,6 +478,7 @@ frl_data <- enr_2026 |>
   head(15) |>
   select(district_name, n_students, pct_display)
 
+stopifnot(nrow(frl_data) > 0)
 frl_data
 ```
 
@@ -486,7 +502,7 @@ frl_data |>
 
 ## 14. Nevada's smallest districts
 
-While Clark County dominates headlines, Nevada has many tiny rural districts. Some have fewer than 500 students total.
+While Clark County dominates headlines, Nevada has many tiny entities. Charter schools and rural districts alike can have fewer than 200 students.
 
 ```{r smallest}
 smallest <- enr_2026 |>
@@ -495,6 +511,7 @@ smallest <- enr_2026 |>
   head(10) |>
   select(district_name, n_students)
 
+stopifnot(nrow(smallest) > 0)
 smallest
 ```
 
@@ -507,7 +524,7 @@ smallest |>
   scale_x_continuous(expand = expansion(mult = c(0, 0.2))) +
   labs(
     title = "Nevada's 10 Smallest Districts (2026)",
-    subtitle = "Many rural counties have tiny school systems",
+    subtitle = "Charter schools and rural counties have the smallest enrollments",
     x = "Total Enrollment",
     y = NULL
   )
@@ -517,7 +534,7 @@ smallest |>
 
 ## 15. IEP students: Special education across Nevada
 
-Students with Individualized Education Programs (IEPs) require specialized services. The distribution of IEP students varies by district.
+Students with Individualized Education Programs (IEPs) require specialized services. Lyon County leads in IEP rate at 17.0%, while some charter networks have lower rates.
 
 ```{r iep}
 iep_data <- enr_2026 |>
@@ -527,6 +544,7 @@ iep_data <- enr_2026 |>
   head(10) |>
   select(district_name, n_students, pct_display)
 
+stopifnot(nrow(iep_data) > 0)
 iep_data
 ```
 
@@ -553,11 +571,11 @@ iep_data |>
 
 Nevada's school enrollment data reveals:
 - **Clark County dominance**: Over 60% of students are in the Las Vegas metro
-- **Demographic shift**: Hispanic students are now the largest demographic group
-- **Urban-rural divide**: Rural Nevada has many districts but a tiny fraction of students
-- **Charter growth**: SPCSA schools are expanding their share of enrollment
+- **Demographic shift**: Hispanic students are now the largest demographic group at 46.5%
+- **Urban-rural divide**: Rural Nevada has many districts but a fraction of students
+- **Charter growth**: 51 charter entities enroll nearly 15% of Nevada students
 - **Stabilization**: After decades of growth, enrollment has plateaued
-- **Economic need**: High FRL rates across most districts indicate widespread economic challenges
+- **Economic need**: Many charter schools report 100% FRL, indicating targeted service to high-need populations
 - **K enrollment**: Kindergarten numbers signal future enrollment trends
 
 These patterns shape school funding debates and facility planning across the Silver State.
