@@ -72,15 +72,17 @@
 <span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/get_theme.html" class="external-link">theme_set</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span>base_size <span class="op">=</span> <span class="fl">14</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>This vignette explores Nevada’s public school enrollment data,
-surfacing key trends and demographic patterns across 10 years of data
-(2016-2026).</p>
+surfacing key trends and demographic patterns across the available years
+(2021-2026). Nevada’s data includes 17 county-based school districts,
+Carson City, and 51 charter school operators under the State Public
+Charter School Authority (SPCSA).</p>
 <hr>
 <div class="section level2">
-<h2 id="nevadas-enrollment-has-plateaued-after-decades-of-growth">1. Nevada’s enrollment has plateaued after decades of growth<a class="anchor" aria-label="anchor" href="#nevadas-enrollment-has-plateaued-after-decades-of-growth"></a>
+<h2 id="nevada-lost-nearly-13000-students-between-2021-and-2026">1. Nevada lost nearly 13,000 students between 2021 and 2026<a class="anchor" aria-label="anchor" href="#nevada-lost-nearly-13000-students-between-2021-and-2026"></a>
 </h2>
 <p>Nevada was one of America’s fastest-growing states for decades, but
-school enrollment has flattened in recent years. The COVID era marked a
-turning point.</p>
+school enrollment has declined since 2022. The state shed 18,681
+students from its 2022 peak to 2026.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Note: 2025 data temporarily unavailable from NDE</span></span>
 <span><span class="va">enr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fetch_enr_multi.html">fetch_enr_multi</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2021</span><span class="op">:</span><span class="fl">2024</span>, <span class="fl">2026</span><span class="op">)</span>, use_cache <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
@@ -92,6 +94,7 @@ turning point.</p>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>change <span class="op">=</span> <span class="va">n_students</span> <span class="op">-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/lead-lag.html" class="external-link">lag</a></span><span class="op">(</span><span class="va">n_students</span><span class="op">)</span>,</span>
 <span>         pct_change <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">change</span> <span class="op">/</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/lead-lag.html" class="external-link">lag</a></span><span class="op">(</span><span class="va">n_students</span><span class="op">)</span> <span class="op">*</span> <span class="fl">100</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">state_totals</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span></span>
 <span><span class="va">state_totals</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 5 × 4</span></span></span>
 <span><span class="co">#&gt;   end_year n_students change pct_change</span></span>
@@ -105,10 +108,14 @@ turning point.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">state_totals</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">end_year</span>, y <span class="op">=</span> <span class="va">n_students</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>linewidth <span class="op">=</span> <span class="fl">1.2</span>, color <span class="op">=</span> <span class="st">"#003366"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">3</span>, color <span class="op">=</span> <span class="st">"#003366"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html" class="external-link">annotate</a></span><span class="op">(</span><span class="st">"rect"</span>, xmin <span class="op">=</span> <span class="fl">2020.5</span>, xmax <span class="op">=</span> <span class="fl">2022.5</span>, ymin <span class="op">=</span> <span class="op">-</span><span class="cn">Inf</span>, ymax <span class="op">=</span> <span class="cn">Inf</span>,</span>
+<span>           alpha <span class="op">=</span> <span class="fl">0.1</span>, fill <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html" class="external-link">annotate</a></span><span class="op">(</span><span class="st">"text"</span>, x <span class="op">=</span> <span class="fl">2021.5</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">state_totals</span><span class="op">$</span><span class="va">n_students</span><span class="op">)</span> <span class="op">+</span> <span class="fl">2000</span>,</span>
+<span>           label <span class="op">=</span> <span class="st">"COVID era"</span>, size <span class="op">=</span> <span class="fl">3</span>, color <span class="op">=</span> <span class="st">"red3"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_y_continuous</a></span><span class="op">(</span>labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="va"><a href="https://scales.r-lib.org/reference/comma.html" class="external-link">comma</a></span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span></span>
 <span>    title <span class="op">=</span> <span class="st">"Nevada Public School Enrollment (2021-2026)"</span>,</span>
-<span>    subtitle <span class="op">=</span> <span class="st">"Enrollment has stabilized after years of rapid growth"</span>,</span>
+<span>    subtitle <span class="op">=</span> <span class="st">"Enrollment peaked in 2022 and has declined since"</span>,</span>
 <span>    x <span class="op">=</span> <span class="st">"School Year (ending)"</span>,</span>
 <span>    y <span class="op">=</span> <span class="st">"Total Enrollment"</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
@@ -116,11 +123,12 @@ turning point.</p>
 <hr>
 </div>
 <div class="section level2">
-<h2 id="clark-county-is-nevadas-education-giant">2. Clark County is Nevada’s education giant<a class="anchor" aria-label="anchor" href="#clark-county-is-nevadas-education-giant"></a>
+<h2 id="charter-schools-crack-the-top-10-in-nevada">2. Charter schools crack the top 10 in Nevada<a class="anchor" aria-label="anchor" href="#charter-schools-crack-the-top-10-in-nevada"></a>
 </h2>
-<p>Clark County School District (Las Vegas metro) is the 5th largest
-school district in America, enrolling more than 70% of all Nevada
-students.</p>
+<p>Clark County dominates, but three charter networks (Somerset,
+Pinecrest, Doral) now enroll more students than most county school
+districts. Somerset Academy alone enrolls more than 14 of the 17 county
+districts.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">enr_2026</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fetch_enr.html">fetch_enr</a></span><span class="op">(</span><span class="fl">2026</span>, use_cache <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
@@ -128,62 +136,68 @@ students.</p>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"total_enrollment"</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">desc</a></span><span class="op">(</span><span class="va">n_students</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">district_name</span>, <span class="va">n_students</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">district_name</span>, <span class="va">n_students</span>, <span class="va">is_charter</span><span class="op">)</span></span>
 <span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">top_districts</span><span class="op">)</span> <span class="op">==</span> <span class="fl">10</span><span class="op">)</span></span>
 <span><span class="va">top_districts</span></span>
-<span><span class="co">#&gt;                         district_name n_students</span></span>
-<span><span class="co">#&gt; 1        Clark County School District     291587</span></span>
-<span><span class="co">#&gt; 2       Washoe County School District      63655</span></span>
-<span><span class="co">#&gt; 3       Somerset Academy of Las Vegas       9534</span></span>
-<span><span class="co">#&gt; 4         Elko County School District       9293</span></span>
-<span><span class="co">#&gt; 5         Lyon County School District       9060</span></span>
-<span><span class="co">#&gt; 6         Pinecrest Academy of Nevada       8474</span></span>
-<span><span class="co">#&gt; 7         Carson City School District       7281</span></span>
-<span><span class="co">#&gt; 8                       Doral Academy       6442</span></span>
-<span><span class="co">#&gt; 9          Nye County School District       5794</span></span>
-<span><span class="co">#&gt; 10 Coral Academy of Science Las Vegas       5552</span></span></code></pre></div>
+<span><span class="co">#&gt;                         district_name n_students is_charter</span></span>
+<span><span class="co">#&gt; 1        Clark County School District     291587      FALSE</span></span>
+<span><span class="co">#&gt; 2       Washoe County School District      63655      FALSE</span></span>
+<span><span class="co">#&gt; 3       Somerset Academy of Las Vegas       9534       TRUE</span></span>
+<span><span class="co">#&gt; 4         Elko County School District       9293      FALSE</span></span>
+<span><span class="co">#&gt; 5         Lyon County School District       9060      FALSE</span></span>
+<span><span class="co">#&gt; 6         Pinecrest Academy of Nevada       8474       TRUE</span></span>
+<span><span class="co">#&gt; 7         Carson City School District       7281      FALSE</span></span>
+<span><span class="co">#&gt; 8                       Doral Academy       6442       TRUE</span></span>
+<span><span class="co">#&gt; 9          Nye County School District       5794      FALSE</span></span>
+<span><span class="co">#&gt; 10 Coral Academy of Science Las Vegas       5552       TRUE</span></span></code></pre></div>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">top_districts</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>district_name <span class="op">=</span> <span class="fu">forcats</span><span class="fu">::</span><span class="fu"><a href="https://forcats.tidyverse.org/reference/fct_reorder.html" class="external-link">fct_reorder</a></span><span class="op">(</span><span class="va">district_name</span>, <span class="va">n_students</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">n_students</span>, y <span class="op">=</span> <span class="va">district_name</span>, fill <span class="op">=</span> <span class="va">district_name</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_col</a></span><span class="op">(</span>show.legend <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>district_name <span class="op">=</span> <span class="fu">forcats</span><span class="fu">::</span><span class="fu"><a href="https://forcats.tidyverse.org/reference/fct_reorder.html" class="external-link">fct_reorder</a></span><span class="op">(</span><span class="va">district_name</span>, <span class="va">n_students</span><span class="op">)</span>,</span>
+<span>         sector <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">is_charter</span>, <span class="st">"Charter"</span>, <span class="st">"County District"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">n_students</span>, y <span class="op">=</span> <span class="va">district_name</span>, fill <span class="op">=</span> <span class="va">sector</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_col</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_text.html" class="external-link">geom_text</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>label <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org/reference/comma.html" class="external-link">comma</a></span><span class="op">(</span><span class="va">n_students</span><span class="op">)</span><span class="op">)</span>, hjust <span class="op">=</span> <span class="op">-</span><span class="fl">0.1</span>, size <span class="op">=</span> <span class="fl">3.5</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_x_continuous</a></span><span class="op">(</span>labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="va"><a href="https://scales.r-lib.org/reference/comma.html" class="external-link">comma</a></span>, expand <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/expansion.html" class="external-link">expansion</a></span><span class="op">(</span>mult <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.15</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html" class="external-link">scale_fill_viridis_d</a></span><span class="op">(</span>option <span class="op">=</span> <span class="st">"mako"</span>, begin <span class="op">=</span> <span class="fl">0.2</span>, end <span class="op">=</span> <span class="fl">0.8</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_fill_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Charter"</span> <span class="op">=</span> <span class="st">"#E67300"</span>, <span class="st">"County District"</span> <span class="op">=</span> <span class="st">"#003366"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span></span>
 <span>    title <span class="op">=</span> <span class="st">"Top 10 Nevada Districts by Enrollment (2026)"</span>,</span>
-<span>    subtitle <span class="op">=</span> <span class="st">"Clark County dominates, followed by Washoe County (Reno)"</span>,</span>
+<span>    subtitle <span class="op">=</span> <span class="st">"Charter networks now rival mid-size county districts"</span>,</span>
 <span>    x <span class="op">=</span> <span class="st">"Number of Students"</span>,</span>
-<span>    y <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>    y <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>    fill <span class="op">=</span> <span class="cn">NULL</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
 <p><img src="enrollment_hooks_files/figure-html/top-districts-chart-1.png" class="r-plt" alt="" width="768"></p>
 <hr>
 </div>
 <div class="section level2">
-<h2 id="nevadas-demographic-transformation">3. Nevada’s demographic transformation<a class="anchor" aria-label="anchor" href="#nevadas-demographic-transformation"></a>
+<h2 id="hispanic-students-are-46-of-enrollment-up-from-43-in-2021">3. Hispanic students are 46% of enrollment, up from 43% in 2021<a class="anchor" aria-label="anchor" href="#hispanic-students-are-46-of-enrollment-up-from-43-in-2021"></a>
 </h2>
-<p>Hispanic students now represent the largest demographic group in
-Nevada public schools, reflecting the state’s rapid population
-change.</p>
+<p>Hispanic students are the largest demographic group in Nevada public
+schools at 45.9%, followed by white students at 25.9%. This reflects a
+continuing demographic shift – Hispanic share has grown each year.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">demographics</span> <span class="op">&lt;-</span> <span class="va">enr_2026</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span>,</span>
-<span>         <span class="va">subgroup</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"white"</span>, <span class="st">"black"</span>, <span class="st">"hispanic"</span>, <span class="st">"asian"</span>, <span class="st">"native_american"</span>, <span class="st">"multiracial"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>         <span class="va">subgroup</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"white"</span>, <span class="st">"black"</span>, <span class="st">"hispanic"</span>, <span class="st">"asian"</span>,</span>
+<span>                         <span class="st">"native_american"</span>, <span class="st">"multiracial"</span>, <span class="st">"pacific_islander"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">subgroup</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span>n_students <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">n_students</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, .groups <span class="op">=</span> <span class="st">"drop"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>pct <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">n_students</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">n_students</span><span class="op">)</span> <span class="op">*</span> <span class="fl">100</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">desc</a></span><span class="op">(</span><span class="va">n_students</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">demographics</span><span class="op">)</span> <span class="op">==</span> <span class="fl">7</span><span class="op">)</span></span>
 <span><span class="va">demographics</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 3</span></span></span>
-<span><span class="co">#&gt;   subgroup        n_students   pct</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> hispanic            <span style="text-decoration: underline;">217</span>320  46.5</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> white               <span style="text-decoration: underline;">122</span>852  26.3</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> black                <span style="text-decoration: underline;">58</span>830  12.6</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> multiracial          <span style="text-decoration: underline;">37</span>516   8  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> asian                <span style="text-decoration: underline;">27</span>170   5.8</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> native_american       <span style="text-decoration: underline;">3</span>347   0.7</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 7 × 3</span></span></span>
+<span><span class="co">#&gt;   subgroup         n_students   pct</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> hispanic             <span style="text-decoration: underline;">217</span>320  45.9</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> white                <span style="text-decoration: underline;">122</span>852  25.9</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> black                 <span style="text-decoration: underline;">58</span>830  12.4</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> multiracial           <span style="text-decoration: underline;">37</span>516   7.9</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> asian                 <span style="text-decoration: underline;">27</span>170   5.7</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> pacific_islander       <span style="text-decoration: underline;">6</span>622   1.4</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">7</span> native_american        <span style="text-decoration: underline;">3</span>347   0.7</span></span></code></pre></div>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">demographics</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>subgroup <span class="op">=</span> <span class="fu">forcats</span><span class="fu">::</span><span class="fu"><a href="https://forcats.tidyverse.org/reference/fct_reorder.html" class="external-link">fct_reorder</a></span><span class="op">(</span><span class="va">subgroup</span>, <span class="va">n_students</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -194,7 +208,7 @@ change.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html" class="external-link">scale_fill_brewer</a></span><span class="op">(</span>palette <span class="op">=</span> <span class="st">"Set2"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span></span>
 <span>    title <span class="op">=</span> <span class="st">"Nevada Student Demographics (2026)"</span>,</span>
-<span>    subtitle <span class="op">=</span> <span class="st">"Hispanic students are now the largest group"</span>,</span>
+<span>    subtitle <span class="op">=</span> <span class="st">"Hispanic students are the largest group at 45.9%"</span>,</span>
 <span>    x <span class="op">=</span> <span class="st">"Number of Students"</span>,</span>
 <span>    y <span class="op">=</span> <span class="cn">NULL</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
@@ -202,45 +216,46 @@ change.</p>
 <hr>
 </div>
 <div class="section level2">
-<h2 id="urban-vs-rural-a-tale-of-two-nevadas">4. Urban vs rural: A tale of two Nevadas<a class="anchor" aria-label="anchor" href="#urban-vs-rural-a-tale-of-two-nevadas"></a>
+<h2 id="las-vegas-metro-has-61-6-of-all-nevada-students">4. Las Vegas Metro has 61.6% of all Nevada students<a class="anchor" aria-label="anchor" href="#las-vegas-metro-has-61-6-of-all-nevada-students"></a>
 </h2>
-<p>Beyond Las Vegas and Reno, Nevada has 15 rural counties with small
-school districts. The contrast is stark.</p>
+<p>Beyond Las Vegas and Reno, the remaining 68 entities (15 rural county
+districts plus charter schools) account for 25% of enrollment.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">regional</span> <span class="op">&lt;-</span> <span class="va">enr_2026</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"total_enrollment"</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>region <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"Clark"</span>, <span class="va">district_name</span><span class="op">)</span> <span class="op">~</span> <span class="st">"Las Vegas Metro"</span>,</span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"Washoe"</span>, <span class="va">district_name</span><span class="op">)</span> <span class="op">~</span> <span class="st">"Reno Metro"</span>,</span>
-<span>    <span class="cn">TRUE</span> <span class="op">~</span> <span class="st">"Rural Nevada"</span></span>
+<span>    <span class="cn">TRUE</span> <span class="op">~</span> <span class="st">"Rest of Nevada"</span></span>
 <span>  <span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span></span>
-<span>    n_districts <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/n_distinct.html" class="external-link">n_distinct</a></span><span class="op">(</span><span class="va">district_name</span><span class="op">)</span>,</span>
+<span>    n_entities <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/n_distinct.html" class="external-link">n_distinct</a></span><span class="op">(</span><span class="va">district_name</span><span class="op">)</span>,</span>
 <span>    total_enrollment <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">n_students</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
 <span>    .groups <span class="op">=</span> <span class="st">"drop"</span></span>
 <span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>pct <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">total_enrollment</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">total_enrollment</span><span class="op">)</span> <span class="op">*</span> <span class="fl">100</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">regional</span><span class="op">)</span> <span class="op">==</span> <span class="fl">3</span><span class="op">)</span></span>
 <span><span class="va">regional</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 4</span></span></span>
-<span><span class="co">#&gt;   region          n_districts total_enrollment   pct</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> Las Vegas Metro           1           <span style="text-decoration: underline;">291</span>587  61.6</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> Reno Metro                1            <span style="text-decoration: underline;">63</span>655  13.4</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> Rural Nevada             68           <span style="text-decoration: underline;">118</span>415  25</span></span></code></pre></div>
+<span><span class="co">#&gt;   region          n_entities total_enrollment   pct</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> Las Vegas Metro          1           <span style="text-decoration: underline;">291</span>587  61.6</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> Reno Metro               1            <span style="text-decoration: underline;">63</span>655  13.4</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> Rest of Nevada          68           <span style="text-decoration: underline;">118</span>415  25</span></span></code></pre></div>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">regional</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>region <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">region</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Las Vegas Metro"</span>, <span class="st">"Reno Metro"</span>, <span class="st">"Rural Nevada"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>region <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">region</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Las Vegas Metro"</span>, <span class="st">"Reno Metro"</span>, <span class="st">"Rest of Nevada"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">region</span>, y <span class="op">=</span> <span class="va">total_enrollment</span>, fill <span class="op">=</span> <span class="va">region</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_col</a></span><span class="op">(</span>show.legend <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_text.html" class="external-link">geom_text</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org/reference/comma.html" class="external-link">comma</a></span><span class="op">(</span><span class="va">total_enrollment</span><span class="op">)</span>, <span class="st">"\n("</span>, <span class="va">pct</span>, <span class="st">"%)"</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>            vjust <span class="op">=</span> <span class="op">-</span><span class="fl">0.2</span>, size <span class="op">=</span> <span class="fl">4</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_y_continuous</a></span><span class="op">(</span>labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="va"><a href="https://scales.r-lib.org/reference/comma.html" class="external-link">comma</a></span>, expand <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/expansion.html" class="external-link">expansion</a></span><span class="op">(</span>mult <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.15</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_fill_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Las Vegas Metro"</span> <span class="op">=</span> <span class="st">"#003366"</span>, <span class="st">"Reno Metro"</span> <span class="op">=</span> <span class="st">"#0066CC"</span>, <span class="st">"Rural Nevada"</span> <span class="op">=</span> <span class="st">"#66B2FF"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_fill_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Las Vegas Metro"</span> <span class="op">=</span> <span class="st">"#003366"</span>, <span class="st">"Reno Metro"</span> <span class="op">=</span> <span class="st">"#0066CC"</span>, <span class="st">"Rest of Nevada"</span> <span class="op">=</span> <span class="st">"#66B2FF"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span></span>
 <span>    title <span class="op">=</span> <span class="st">"Enrollment by Region (2026)"</span>,</span>
-<span>    subtitle <span class="op">=</span> <span class="st">"Las Vegas dominates Nevada education"</span>,</span>
+<span>    subtitle <span class="op">=</span> <span class="st">"Las Vegas dominates; 'Rest of Nevada' includes rural counties and charters"</span>,</span>
 <span>    x <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>    y <span class="op">=</span> <span class="st">"Number of Students"</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
@@ -248,15 +263,16 @@ school districts. The contrast is stark.</p>
 <hr>
 </div>
 <div class="section level2">
-<h2 id="clark-county-vs-washoe-county-different-trajectories">5. Clark County vs Washoe County: Different trajectories<a class="anchor" aria-label="anchor" href="#clark-county-vs-washoe-county-different-trajectories"></a>
+<h2 id="clark-county-lost-27706-students-since-2021-while-washoe-held-steady">5. Clark County lost 27,706 students since 2021 while Washoe held
+steady<a class="anchor" aria-label="anchor" href="#clark-county-lost-27706-students-since-2021-while-washoe-held-steady"></a>
 </h2>
 <p>Clark County (Las Vegas) and Washoe County (Reno) are Nevada’s two
-urban anchors. How have their enrollment trends diverged?</p>
+urban anchors. Clark dropped 8.7% from 2021 to 2026 while Washoe only
+dropped 2.1%.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">growth_data</span> <span class="op">&lt;-</span> <span class="va">enr</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"total_enrollment"</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span>,</span>
 <span>         <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"Clark|Washoe"</span>, <span class="va">district_name</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="co"># Normalize district names (format changed across years)</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>county <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"Clark"</span>, <span class="va">district_name</span><span class="op">)</span> <span class="op">~</span> <span class="st">"Clark County"</span>,</span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"Washoe"</span>, <span class="va">district_name</span><span class="op">)</span> <span class="op">~</span> <span class="st">"Washoe County"</span></span>
@@ -264,17 +280,35 @@ urban anchors. How have their enrollment trends diverged?</p>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">county</span>, <span class="va">end_year</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span>n_students <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">n_students</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, .groups <span class="op">=</span> <span class="st">"drop"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">county</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>index <span class="op">=</span> <span class="va">n_students</span> <span class="op">/</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/nth.html" class="external-link">first</a></span><span class="op">(</span><span class="va">n_students</span><span class="op">)</span> <span class="op">*</span> <span class="fl">100</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>index <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">n_students</span> <span class="op">/</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/nth.html" class="external-link">first</a></span><span class="op">(</span><span class="va">n_students</span><span class="op">)</span> <span class="op">*</span> <span class="fl">100</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">growth_data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">end_year</span>, y <span class="op">=</span> <span class="va">index</span>, color <span class="op">=</span> <span class="va">county</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">growth_data</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span></span>
+<span><span class="va">growth_data</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 10 × 4</span></span></span>
+<span><span class="co">#&gt;    county        end_year n_students index</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> Clark County      <span style="text-decoration: underline;">2</span>021     <span style="text-decoration: underline;">319</span>293 100  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> Clark County      <span style="text-decoration: underline;">2</span>022     <span style="text-decoration: underline;">320</span>245 100. </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> Clark County      <span style="text-decoration: underline;">2</span>023     <span style="text-decoration: underline;">314</span>372  98.5</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> Clark County      <span style="text-decoration: underline;">2</span>024     <span style="text-decoration: underline;">309</span>397  96.9</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> Clark County      <span style="text-decoration: underline;">2</span>026     <span style="text-decoration: underline;">291</span>587  91.3</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> Washoe County     <span style="text-decoration: underline;">2</span>021      <span style="text-decoration: underline;">64</span>988 100  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> Washoe County     <span style="text-decoration: underline;">2</span>022      <span style="text-decoration: underline;">66</span>541 102. </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> Washoe County     <span style="text-decoration: underline;">2</span>023      <span style="text-decoration: underline;">64</span>990 100  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> Washoe County     <span style="text-decoration: underline;">2</span>024      <span style="text-decoration: underline;">64</span>755  99.6</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> Washoe County     <span style="text-decoration: underline;">2</span>026      <span style="text-decoration: underline;">63</span>655  97.9</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">growth_data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">end_year</span>, y <span class="op">=</span> <span class="va">index</span>, color <span class="op">=</span> <span class="va">county</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>linewidth <span class="op">=</span> <span class="fl">1.2</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_hline</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">100</span>, linetype <span class="op">=</span> <span class="st">"dashed"</span>, color <span class="op">=</span> <span class="st">"gray50"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html" class="external-link">annotate</a></span><span class="op">(</span><span class="st">"rect"</span>, xmin <span class="op">=</span> <span class="fl">2020.5</span>, xmax <span class="op">=</span> <span class="fl">2022.5</span>, ymin <span class="op">=</span> <span class="op">-</span><span class="cn">Inf</span>, ymax <span class="op">=</span> <span class="cn">Inf</span>,</span>
+<span>           alpha <span class="op">=</span> <span class="fl">0.1</span>, fill <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_color_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Clark County"</span> <span class="op">=</span> <span class="st">"#BF0A30"</span>, <span class="st">"Washoe County"</span> <span class="op">=</span> <span class="st">"#002868"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span></span>
 <span>    title <span class="op">=</span> <span class="st">"Clark vs Washoe County Enrollment Trends"</span>,</span>
-<span>    subtitle <span class="op">=</span> <span class="st">"Indexed to 2021 = 100"</span>,</span>
+<span>    subtitle <span class="op">=</span> <span class="st">"Indexed to 2021 = 100. Clark declining much faster than Washoe."</span>,</span>
 <span>    x <span class="op">=</span> <span class="st">"School Year"</span>,</span>
 <span>    y <span class="op">=</span> <span class="st">"Enrollment Index (2021 = 100)"</span>,</span>
 <span>    color <span class="op">=</span> <span class="st">"District"</span></span>
@@ -283,52 +317,60 @@ urban anchors. How have their enrollment trends diverged?</p>
 <hr>
 </div>
 <div class="section level2">
-<h2 id="charter-schools-are-growing-through-spcsa">6. Charter schools are growing through SPCSA<a class="anchor" aria-label="anchor" href="#charter-schools-are-growing-through-spcsa"></a>
+<h2 id="charter-enrollment-surged-33-while-traditional-districts-lost-30000-students">6. Charter enrollment surged 33% while traditional districts lost
+30,000 students<a class="anchor" aria-label="anchor" href="#charter-enrollment-surged-33-while-traditional-districts-lost-30000-students"></a>
 </h2>
 <p>The State Public Charter School Authority (SPCSA) oversees Nevada’s
-state-sponsored charter schools. This sector has been expanding
-rapidly.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">charter_enr</span> <span class="op">&lt;-</span> <span class="va">enr_2026</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"total_enrollment"</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>is_charter <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"SPCSA|Charter"</span>, <span class="va">district_name</span>, ignore.case <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">is_charter</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span></span>
-<span>    students <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">n_students</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
-<span>    districts <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>    .groups <span class="op">=</span> <span class="st">"drop"</span></span>
-<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>sector <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">is_charter</span>, <span class="st">"Charter (SPCSA)"</span>, <span class="st">"Traditional Districts"</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">charter_enr</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">sector</span>, <span class="va">students</span>, <span class="va">districts</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 3</span></span></span>
-<span><span class="co">#&gt;   sector                students districts</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> Traditional Districts   <span style="text-decoration: underline;">468</span>495        65</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> Charter (SPCSA)           <span style="text-decoration: underline;">5</span>162         5</span></span></code></pre></div>
+charter sector. Charters grew from 53,223 students in 2021 to 70,534 in
+2026 – a 33% increase – while traditional districts lost 30,287 students
+in the same period.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">charter_enr</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">sector</span>, y <span class="op">=</span> <span class="va">students</span>, fill <span class="op">=</span> <span class="va">sector</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_col</a></span><span class="op">(</span>show.legend <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_text.html" class="external-link">geom_text</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>label <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org/reference/comma.html" class="external-link">comma</a></span><span class="op">(</span><span class="va">students</span><span class="op">)</span><span class="op">)</span>, vjust <span class="op">=</span> <span class="op">-</span><span class="fl">0.2</span>, size <span class="op">=</span> <span class="fl">4</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_y_continuous</a></span><span class="op">(</span>labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="va"><a href="https://scales.r-lib.org/reference/comma.html" class="external-link">comma</a></span>, expand <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/expansion.html" class="external-link">expansion</a></span><span class="op">(</span>mult <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.15</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_fill_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Charter (SPCSA)"</span> <span class="op">=</span> <span class="st">"#E67300"</span>, <span class="st">"Traditional Districts"</span> <span class="op">=</span> <span class="st">"#003366"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<code class="sourceCode R"><span><span class="va">charter_trend</span> <span class="op">&lt;-</span> <span class="va">enr</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"total_enrollment"</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">end_year</span>, <span class="va">is_charter</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span>students <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">n_students</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>            n_districts <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span>, .groups <span class="op">=</span> <span class="st">"drop"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>sector <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">is_charter</span>, <span class="st">"Charter"</span>, <span class="st">"Traditional"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">charter_trend</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span></span>
+<span><span class="va">charter_trend</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">end_year</span>, <span class="va">sector</span>, <span class="va">students</span>, <span class="va">n_districts</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 10 × 4</span></span></span>
+<span><span class="co">#&gt;    end_year sector      students n_districts</span></span>
+<span><span class="co">#&gt;       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>     <span style="text-decoration: underline;">2</span>021 Traditional   <span style="text-decoration: underline;">433</span>410          19</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>     <span style="text-decoration: underline;">2</span>021 Charter        <span style="text-decoration: underline;">53</span>223          37</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>     <span style="text-decoration: underline;">2</span>022 Traditional   <span style="text-decoration: underline;">436</span>923          19</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>     <span style="text-decoration: underline;">2</span>022 Charter        <span style="text-decoration: underline;">55</span>415          38</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>     <span style="text-decoration: underline;">2</span>023 Traditional   <span style="text-decoration: underline;">429</span>927          19</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>     <span style="text-decoration: underline;">2</span>023 Charter        <span style="text-decoration: underline;">59</span>670          43</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>     <span style="text-decoration: underline;">2</span>024 Traditional   <span style="text-decoration: underline;">423</span>687          19</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>     <span style="text-decoration: underline;">2</span>024 Charter        <span style="text-decoration: underline;">61</span>883          44</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>     <span style="text-decoration: underline;">2</span>026 Traditional   <span style="text-decoration: underline;">403</span>123          19</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>     <span style="text-decoration: underline;">2</span>026 Charter        <span style="text-decoration: underline;">70</span>534          51</span></span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">charter_trend</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">end_year</span>, y <span class="op">=</span> <span class="va">students</span>, color <span class="op">=</span> <span class="va">sector</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>linewidth <span class="op">=</span> <span class="fl">1.2</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html" class="external-link">annotate</a></span><span class="op">(</span><span class="st">"rect"</span>, xmin <span class="op">=</span> <span class="fl">2020.5</span>, xmax <span class="op">=</span> <span class="fl">2022.5</span>, ymin <span class="op">=</span> <span class="op">-</span><span class="cn">Inf</span>, ymax <span class="op">=</span> <span class="cn">Inf</span>,</span>
+<span>           alpha <span class="op">=</span> <span class="fl">0.1</span>, fill <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_y_continuous</a></span><span class="op">(</span>labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="va"><a href="https://scales.r-lib.org/reference/comma.html" class="external-link">comma</a></span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_color_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Charter"</span> <span class="op">=</span> <span class="st">"#E67300"</span>, <span class="st">"Traditional"</span> <span class="op">=</span> <span class="st">"#003366"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span></span>
-<span>    title <span class="op">=</span> <span class="st">"Traditional vs Charter School Enrollment (2026)"</span>,</span>
-<span>    subtitle <span class="op">=</span> <span class="st">"SPCSA manages Nevada's state-sponsored charter sector"</span>,</span>
-<span>    x <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>    y <span class="op">=</span> <span class="st">"Number of Students"</span></span>
+<span>    title <span class="op">=</span> <span class="st">"Charter vs Traditional Enrollment Trends (2021-2026)"</span>,</span>
+<span>    subtitle <span class="op">=</span> <span class="st">"Charters grew 33% while traditional districts declined 7%"</span>,</span>
+<span>    x <span class="op">=</span> <span class="st">"School Year (ending)"</span>,</span>
+<span>    y <span class="op">=</span> <span class="st">"Number of Students"</span>,</span>
+<span>    color <span class="op">=</span> <span class="st">"Sector"</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
 <p><img src="enrollment_hooks_files/figure-html/charter-chart-1.png" class="r-plt" alt="" width="768"></p>
 <hr>
 </div>
 <div class="section level2">
-<h2 id="washoe-county-nevadas-second-city">7. Washoe County: Nevada’s second city<a class="anchor" aria-label="anchor" href="#washoe-county-nevadas-second-city"></a>
+<h2 id="washoe-county-lost-1333-students-over-5-years">7. Washoe County lost 1,333 students over 5 years<a class="anchor" aria-label="anchor" href="#washoe-county-lost-1333-students-over-5-years"></a>
 </h2>
-<p>Washoe County (Reno-Sparks) is Nevada’s second-largest district.
-While smaller than Clark County, it educates over 60,000 students.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<p>Washoe County (Reno-Sparks) is Nevada’s second-largest district. It
+peaked at 66,541 in 2022 before declining.</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">washoe_data</span> <span class="op">&lt;-</span> <span class="va">enr</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"total_enrollment"</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span>,</span>
 <span>         <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"Washoe"</span>, <span class="va">district_name</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -337,6 +379,7 @@ While smaller than Clark County, it educates over 60,000 students.</p>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>change <span class="op">=</span> <span class="va">n_students</span> <span class="op">-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/lead-lag.html" class="external-link">lag</a></span><span class="op">(</span><span class="va">n_students</span><span class="op">)</span>,</span>
 <span>         pct_change <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">change</span> <span class="op">/</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/lead-lag.html" class="external-link">lag</a></span><span class="op">(</span><span class="va">n_students</span><span class="op">)</span> <span class="op">*</span> <span class="fl">100</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">washoe_data</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span></span>
 <span><span class="va">washoe_data</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 5 × 4</span></span></span>
 <span><span class="co">#&gt;   end_year n_students change pct_change</span></span>
@@ -346,14 +389,14 @@ While smaller than Clark County, it educates over 60,000 students.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>     <span style="text-decoration: underline;">2</span>023      <span style="text-decoration: underline;">64</span>990  -<span style="color: #BB0000; text-decoration: underline;">1</span><span style="color: #BB0000;">551</span>      -<span style="color: #BB0000;">2.33</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>     <span style="text-decoration: underline;">2</span>024      <span style="text-decoration: underline;">64</span>755   -<span style="color: #BB0000;">235</span>      -<span style="color: #BB0000;">0.36</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>     <span style="text-decoration: underline;">2</span>026      <span style="text-decoration: underline;">63</span>655  -<span style="color: #BB0000; text-decoration: underline;">1</span><span style="color: #BB0000;">100</span>      -<span style="color: #BB0000;">1.7</span></span></span></code></pre></div>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">washoe_data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">end_year</span>, y <span class="op">=</span> <span class="va">n_students</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>linewidth <span class="op">=</span> <span class="fl">1.2</span>, color <span class="op">=</span> <span class="st">"#002868"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">3</span>, color <span class="op">=</span> <span class="st">"#002868"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_y_continuous</a></span><span class="op">(</span>labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="va"><a href="https://scales.r-lib.org/reference/comma.html" class="external-link">comma</a></span>, limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="cn">NA</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span></span>
 <span>    title <span class="op">=</span> <span class="st">"Washoe County School District Enrollment"</span>,</span>
-<span>    subtitle <span class="op">=</span> <span class="st">"Reno-Sparks metro area trends"</span>,</span>
+<span>    subtitle <span class="op">=</span> <span class="st">"Reno-Sparks metro area trends (2021-2026)"</span>,</span>
 <span>    x <span class="op">=</span> <span class="st">"School Year (ending)"</span>,</span>
 <span>    y <span class="op">=</span> <span class="st">"Total Enrollment"</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
@@ -361,30 +404,48 @@ While smaller than Clark County, it educates over 60,000 students.</p>
 <hr>
 </div>
 <div class="section level2">
-<h2 id="grade-level-enrollment-patterns">8. Grade-level enrollment patterns<a class="anchor" aria-label="anchor" href="#grade-level-enrollment-patterns"></a>
+<h2 id="th-grade-has-the-most-students-pk-has-the-fewest">8. 9th grade has the most students; PK has the fewest<a class="anchor" aria-label="anchor" href="#th-grade-has-the-most-students-pk-has-the-fewest"></a>
 </h2>
-<p>Tracking enrollment by grade reveals where schools are growing or
-shrinking. Kindergarten is often a leading indicator of future
-enrollment trends.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<p>Tracking enrollment by grade reveals a classic pattern: PK is small
+(13,852), enrollment jumps at K (30,490), and peaks in high school
+around 9th grade (37,251). Grade-level data is available at the school
+level.</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">grade_data</span> <span class="op">&lt;-</span> <span class="va">enr_2026</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"total_enrollment"</span>,</span>
-<span>         <span class="op">!</span><span class="va">grade_level</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"TOTAL"</span>, <span class="st">"UG"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_school</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"total_enrollment"</span>,</span>
+<span>         <span class="op">!</span><span class="va">grade_level</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"TOTAL"</span>, <span class="st">"UG"</span>, <span class="st">"AD"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">grade_level</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span>n_students <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">n_students</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, .groups <span class="op">=</span> <span class="st">"drop"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>grade_level <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">grade_level</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"PK"</span>, <span class="st">"K"</span>, <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"%02d"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">12</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>grade_level <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">grade_level</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"PK"</span>, <span class="st">"K"</span>, <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"%02d"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">12</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">grade_level</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">grade_data</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span></span>
 <span><span class="va">grade_data</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 0 × 2</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 2 variables: grade_level &lt;fct&gt;, n_students &lt;dbl&gt;</span></span></span></code></pre></div>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 14 × 2</span></span></span>
+<span><span class="co">#&gt;    grade_level n_students</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> 01               <span style="text-decoration: underline;">31</span>486</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> 02               <span style="text-decoration: underline;">30</span>265</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> 03               <span style="text-decoration: underline;">33</span>417</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> 04               <span style="text-decoration: underline;">35</span>890</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> 05               <span style="text-decoration: underline;">34</span>847</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> 06               <span style="text-decoration: underline;">35</span>814</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> 07               <span style="text-decoration: underline;">36</span>276</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> 08               <span style="text-decoration: underline;">36</span>577</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> 09               <span style="text-decoration: underline;">37</span>251</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> 10               <span style="text-decoration: underline;">37</span>010</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">11</span> 11               <span style="text-decoration: underline;">37</span>217</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">12</span> 12               <span style="text-decoration: underline;">37</span>730</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">13</span> K                <span style="text-decoration: underline;">30</span>490</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">14</span> PK               <span style="text-decoration: underline;">13</span>852</span></span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">grade_data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">grade_level</span>, y <span class="op">=</span> <span class="va">n_students</span>, fill <span class="op">=</span> <span class="va">grade_level</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_col</a></span><span class="op">(</span>show.legend <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_y_continuous</a></span><span class="op">(</span>labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="va"><a href="https://scales.r-lib.org/reference/comma.html" class="external-link">comma</a></span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html" class="external-link">scale_fill_viridis_d</a></span><span class="op">(</span>option <span class="op">=</span> <span class="st">"viridis"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span></span>
 <span>    title <span class="op">=</span> <span class="st">"Nevada Enrollment by Grade Level (2026)"</span>,</span>
-<span>    subtitle <span class="op">=</span> <span class="st">"Distribution across K-12 grades"</span>,</span>
+<span>    subtitle <span class="op">=</span> <span class="st">"School-level aggregation across all districts"</span>,</span>
 <span>    x <span class="op">=</span> <span class="st">"Grade Level"</span>,</span>
 <span>    y <span class="op">=</span> <span class="st">"Number of Students"</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
@@ -392,11 +453,11 @@ enrollment trends.</p>
 <hr>
 </div>
 <div class="section level2">
-<h2 id="gender-enrollment-balance">9. Gender enrollment balance<a class="anchor" aria-label="anchor" href="#gender-enrollment-balance"></a>
+<h2 id="boys-outnumber-girls-51-3-to-48-7-statewide">9. Boys outnumber girls 51.3% to 48.7% statewide<a class="anchor" aria-label="anchor" href="#boys-outnumber-girls-51-3-to-48-7-statewide"></a>
 </h2>
-<p>How does the male/female ratio vary across Nevada? Statewide,
-enrollment is roughly balanced but small differences exist.</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<p>The gender split across Nevada schools is close to even, with a
+slight male skew consistent with national patterns.</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">gender_data</span> <span class="op">&lt;-</span> <span class="va">enr_2026</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span>,</span>
 <span>         <span class="va">subgroup</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"male"</span>, <span class="st">"female"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -404,13 +465,14 @@ enrollment is roughly balanced but small differences exist.</p>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span>n_students <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">n_students</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, .groups <span class="op">=</span> <span class="st">"drop"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>pct <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">n_students</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">n_students</span><span class="op">)</span> <span class="op">*</span> <span class="fl">100</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">gender_data</span><span class="op">)</span> <span class="op">==</span> <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="va">gender_data</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 3</span></span></span>
 <span><span class="co">#&gt;   subgroup n_students   pct</span></span>
 <span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> female       <span style="text-decoration: underline;">230</span>511  48.7</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> male         <span style="text-decoration: underline;">243</span>022  51.3</span></span></code></pre></div>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">gender_data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">subgroup</span>, y <span class="op">=</span> <span class="va">n_students</span>, fill <span class="op">=</span> <span class="va">subgroup</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_col</a></span><span class="op">(</span>show.legend <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_text.html" class="external-link">geom_text</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>label <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org/reference/comma.html" class="external-link">comma</a></span><span class="op">(</span><span class="va">n_students</span><span class="op">)</span>, <span class="st">"\n("</span>, <span class="va">pct</span>, <span class="st">"%)"</span><span class="op">)</span><span class="op">)</span>,</span>
@@ -427,31 +489,40 @@ enrollment is roughly balanced but small differences exist.</p>
 <hr>
 </div>
 <div class="section level2">
-<h2 id="special-populations-across-districts">10. Special populations across districts<a class="anchor" aria-label="anchor" href="#special-populations-across-districts"></a>
+<h2 id="clark-county-has-5x-more-el-students-than-washoe-but-similar-frl-rates">10. Clark County has 5x more EL students than Washoe but similar FRL
+rates<a class="anchor" aria-label="anchor" href="#clark-county-has-5x-more-el-students-than-washoe-but-similar-frl-rates"></a>
 </h2>
 <p>English Learners, students with IEPs, and Free/Reduced Lunch eligible
-students represent key populations for educational policy. How do the
-two largest districts compare?</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+students represent key populations for educational policy. Clark County
+has ~46,000 EL students vs Washoe’s ~9,200.</p>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">special_pops</span> <span class="op">&lt;-</span> <span class="va">enr_2026</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span>,</span>
-<span>         <span class="va">subgroup</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"frl"</span>, <span class="st">"iep"</span>, <span class="st">"el"</span><span class="op">)</span>,</span>
+<span>         <span class="va">subgroup</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"free_reduced_lunch"</span>, <span class="st">"special_ed"</span>, <span class="st">"lep"</span><span class="op">)</span>,</span>
 <span>         <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"Clark|Washoe"</span>, <span class="va">district_name</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>county <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"Clark"</span>, <span class="va">district_name</span><span class="op">)</span>, <span class="st">"Clark County"</span>, <span class="st">"Washoe County"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">county</span>, <span class="va">subgroup</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span>n_students <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">n_students</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, .groups <span class="op">=</span> <span class="st">"drop"</span><span class="op">)</span></span>
 <span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">special_pops</span><span class="op">)</span> <span class="op">==</span> <span class="fl">6</span><span class="op">)</span></span>
 <span><span class="va">special_pops</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 0 × 3</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 3 variables: county &lt;lgl&gt;, subgroup &lt;chr&gt;, n_students &lt;dbl&gt;</span></span></span></code></pre></div>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 3</span></span></span>
+<span><span class="co">#&gt;   county        subgroup           n_students</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> Clark County  free_reduced_lunch     <span style="text-decoration: underline;">282</span>969</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> Clark County  lep                     <span style="text-decoration: underline;">45</span>993</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> Clark County  special_ed              <span style="text-decoration: underline;">44</span>484</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> Washoe County free_reduced_lunch      <span style="text-decoration: underline;">39</span>010</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> Washoe County lep                      <span style="text-decoration: underline;">9</span>229</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> Washoe County special_ed              <span style="text-decoration: underline;">10</span>537</span></span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">special_pops</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">subgroup</span>, y <span class="op">=</span> <span class="va">n_students</span>, fill <span class="op">=</span> <span class="va">county</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_col</a></span><span class="op">(</span>position <span class="op">=</span> <span class="st">"dodge"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_text.html" class="external-link">geom_text</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>label <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org/reference/comma.html" class="external-link">comma</a></span><span class="op">(</span><span class="va">n_students</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>            position <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/position_dodge.html" class="external-link">position_dodge</a></span><span class="op">(</span>width <span class="op">=</span> <span class="fl">0.9</span><span class="op">)</span>, vjust <span class="op">=</span> <span class="op">-</span><span class="fl">0.2</span>, size <span class="op">=</span> <span class="fl">3</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_y_continuous</a></span><span class="op">(</span>labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="va"><a href="https://scales.r-lib.org/reference/comma.html" class="external-link">comma</a></span>, expand <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/expansion.html" class="external-link">expansion</a></span><span class="op">(</span>mult <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.15</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_fill_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Clark County"</span> <span class="op">=</span> <span class="st">"#BF0A30"</span>, <span class="st">"Washoe County"</span> <span class="op">=</span> <span class="st">"#002868"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_discrete.html" class="external-link">scale_x_discrete</a></span><span class="op">(</span>labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"el"</span> <span class="op">=</span> <span class="st">"English\nLearners"</span>, <span class="st">"frl"</span> <span class="op">=</span> <span class="st">"Free/Reduced\nLunch"</span>, <span class="st">"iep"</span> <span class="op">=</span> <span class="st">"Students\nwith IEPs"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_discrete.html" class="external-link">scale_x_discrete</a></span><span class="op">(</span>labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"lep"</span> <span class="op">=</span> <span class="st">"English\nLearners"</span>, <span class="st">"free_reduced_lunch"</span> <span class="op">=</span> <span class="st">"Free/Reduced\nLunch"</span>, <span class="st">"special_ed"</span> <span class="op">=</span> <span class="st">"Students\nwith IEPs"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span></span>
 <span>    title <span class="op">=</span> <span class="st">"Special Populations: Clark vs Washoe County (2026)"</span>,</span>
 <span>    subtitle <span class="op">=</span> <span class="st">"EL, FRL, and IEP student counts"</span>,</span>
@@ -463,46 +534,41 @@ two largest districts compare?</p>
 <hr>
 </div>
 <div class="section level2">
-<h2 id="summary">Summary<a class="anchor" aria-label="anchor" href="#summary"></a>
+<h2 id="kindergarten-enrollment-swung-wildly-up-8-in-2022-down-9-in-2024">11. Kindergarten enrollment swung wildly: up 8% in 2022, down 9% in
+2024<a class="anchor" aria-label="anchor" href="#kindergarten-enrollment-swung-wildly-up-8-in-2022-down-9-in-2024"></a>
 </h2>
-<p>Nevada’s school enrollment data reveals: - <strong>Clark County
-dominance</strong>: Over 70% of students are in the Las Vegas metro -
-<strong>Demographic shift</strong>: Hispanic students are now the
-largest demographic group - <strong>Urban-rural divide</strong>: Rural
-Nevada has 15 districts but a tiny fraction of students -
-<strong>Charter growth</strong>: SPCSA schools are expanding their share
-of enrollment - <strong>Stabilization</strong>: After decades of growth,
-enrollment has plateaued</p>
-<p>These patterns shape school funding debates and facility planning
-across the Silver State.</p>
-<hr>
-</div>
-<div class="section level2">
-<h2 id="kindergarten-enrollment-as-a-leading-indicator">11. Kindergarten enrollment as a leading indicator<a class="anchor" aria-label="anchor" href="#kindergarten-enrollment-as-a-leading-indicator"></a>
-</h2>
-<p>Kindergarten enrollment often predicts future district growth. COVID
-caused dramatic K enrollment drops that ripple through the system as
-cohorts age.</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<p>Kindergarten enrollment is a leading indicator of future trends.
+Nevada K enrollment hit 34,641 in 2022 then crashed to 28,931 in 2024
+before recovering to 30,490 in 2026. Grade-level data is available at
+the school level.</p>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">k_data</span> <span class="op">&lt;-</span> <span class="va">enr</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"total_enrollment"</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"K"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_school</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"total_enrollment"</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"K"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">end_year</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span>k_students <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">n_students</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, .groups <span class="op">=</span> <span class="st">"drop"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>change <span class="op">=</span> <span class="va">k_students</span> <span class="op">-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/lead-lag.html" class="external-link">lag</a></span><span class="op">(</span><span class="va">k_students</span><span class="op">)</span>,</span>
 <span>         pct_change <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">change</span> <span class="op">/</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/lead-lag.html" class="external-link">lag</a></span><span class="op">(</span><span class="va">k_students</span><span class="op">)</span> <span class="op">*</span> <span class="fl">100</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">k_data</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span></span>
 <span><span class="va">k_data</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 0 × 4</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 4 variables: end_year &lt;dbl&gt;, k_students &lt;dbl&gt;, change &lt;dbl&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   pct_change &lt;dbl&gt;</span></span></span></code></pre></div>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 5 × 4</span></span></span>
+<span><span class="co">#&gt;   end_year k_students change pct_change</span></span>
+<span><span class="co">#&gt;      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>     <span style="text-decoration: underline;">2</span>021      <span style="text-decoration: underline;">31</span>995     <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>     <span style="text-decoration: underline;">2</span>022      <span style="text-decoration: underline;">34</span>641   <span style="text-decoration: underline;">2</span>646       8.27</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>     <span style="text-decoration: underline;">2</span>023      <span style="text-decoration: underline;">31</span>951  -<span style="color: #BB0000; text-decoration: underline;">2</span><span style="color: #BB0000;">690</span>      -<span style="color: #BB0000;">7.77</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>     <span style="text-decoration: underline;">2</span>024      <span style="text-decoration: underline;">28</span>931  -<span style="color: #BB0000; text-decoration: underline;">3</span><span style="color: #BB0000;">020</span>      -<span style="color: #BB0000;">9.45</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>     <span style="text-decoration: underline;">2</span>026      <span style="text-decoration: underline;">30</span>490   <span style="text-decoration: underline;">1</span>559       5.39</span></span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">k_data</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">end_year</span>, y <span class="op">=</span> <span class="va">k_students</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>linewidth <span class="op">=</span> <span class="fl">1.2</span>, color <span class="op">=</span> <span class="st">"#E67300"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">3</span>, color <span class="op">=</span> <span class="st">"#E67300"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html" class="external-link">annotate</a></span><span class="op">(</span><span class="st">"rect"</span>, xmin <span class="op">=</span> <span class="fl">2020.5</span>, xmax <span class="op">=</span> <span class="fl">2022.5</span>, ymin <span class="op">=</span> <span class="op">-</span><span class="cn">Inf</span>, ymax <span class="op">=</span> <span class="cn">Inf</span>,</span>
+<span>           alpha <span class="op">=</span> <span class="fl">0.1</span>, fill <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_y_continuous</a></span><span class="op">(</span>labels <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="va"><a href="https://scales.r-lib.org/reference/comma.html" class="external-link">comma</a></span>, limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="cn">NA</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span></span>
 <span>    title <span class="op">=</span> <span class="st">"Nevada Kindergarten Enrollment (2021-2026)"</span>,</span>
-<span>    subtitle <span class="op">=</span> <span class="st">"K enrollment is a leading indicator of future trends"</span>,</span>
+<span>    subtitle <span class="op">=</span> <span class="st">"K enrollment swings from post-COVID recovery to decline and back"</span>,</span>
 <span>    x <span class="op">=</span> <span class="st">"School Year (ending)"</span>,</span>
 <span>    y <span class="op">=</span> <span class="st">"Kindergarten Students"</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
@@ -510,22 +576,32 @@ cohorts age.</p>
 <hr>
 </div>
 <div class="section level2">
-<h2 id="english-learners-across-nevada">12. English Learners across Nevada<a class="anchor" aria-label="anchor" href="#english-learners-across-nevada"></a>
+<h2 id="mater-academy-has-the-highest-el-concentration-at-34">12. Mater Academy has the highest EL concentration at 34%<a class="anchor" aria-label="anchor" href="#mater-academy-has-the-highest-el-concentration-at-34"></a>
 </h2>
-<p>English Learner (EL) populations vary dramatically across Nevada
-districts. Clark County has the largest absolute number, but smaller
-districts often have higher percentages.</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<p>English Learner populations vary dramatically. Clark County leads in
+absolute numbers (45,993), but several charter schools have much higher
+EL concentrations. Mater Academy of Nevada has 34.3% EL students.</p>
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">el_data</span> <span class="op">&lt;-</span> <span class="va">enr_2026</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"el"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"lep"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">desc</a></span><span class="op">(</span><span class="va">n_students</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">district_name</span>, <span class="va">n_students</span>, <span class="va">pct</span><span class="op">)</span></span>
 <span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">el_data</span><span class="op">)</span> <span class="op">==</span> <span class="fl">10</span><span class="op">)</span></span>
 <span><span class="va">el_data</span></span>
-<span><span class="co">#&gt; [1] district_name n_students    pct          </span></span>
-<span><span class="co">#&gt; &lt;0 rows&gt; (or 0-length row.names)</span></span></code></pre></div>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<span><span class="co">#&gt;                    district_name n_students        pct</span></span>
+<span><span class="co">#&gt; 1   Clark County School District      45993 0.15773337</span></span>
+<span><span class="co">#&gt; 2  Washoe County School District       9229 0.14498468</span></span>
+<span><span class="co">#&gt; 3        Mater Academy of Nevada       1816 0.34283557</span></span>
+<span><span class="co">#&gt; 4    Carson City School District        916 0.12580689</span></span>
+<span><span class="co">#&gt; 5    Elko County School District        774 0.08328850</span></span>
+<span><span class="co">#&gt; 6    Lyon County School District        637 0.07030905</span></span>
+<span><span class="co">#&gt; 7     Nye County School District        449 0.07749396</span></span>
+<span><span class="co">#&gt; 8  Somerset Academy of Las Vegas        405 0.04247955</span></span>
+<span><span class="co">#&gt; 9                 CIVICA Academy        403 0.28044537</span></span>
+<span><span class="co">#&gt; 10                Equipo Academy        365 0.38461538</span></span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">el_data</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>district_name <span class="op">=</span> <span class="fu">forcats</span><span class="fu">::</span><span class="fu"><a href="https://forcats.tidyverse.org/reference/fct_reorder.html" class="external-link">fct_reorder</a></span><span class="op">(</span><span class="va">district_name</span>, <span class="va">n_students</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">n_students</span>, y <span class="op">=</span> <span class="va">district_name</span>, fill <span class="op">=</span> <span class="va">pct</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
@@ -544,23 +620,38 @@ districts often have higher percentages.</p>
 <hr>
 </div>
 <div class="section level2">
-<h2 id="freereduced-lunch-eligibility-reveals-economic-disparities">13. Free/Reduced Lunch eligibility reveals economic disparities<a class="anchor" aria-label="anchor" href="#freereduced-lunch-eligibility-reveals-economic-disparities"></a>
+<h2 id="fifteen-districts-report-100-frl-eligibility">13. Fifteen districts report 100% FRL eligibility<a class="anchor" aria-label="anchor" href="#fifteen-districts-report-100-frl-eligibility"></a>
 </h2>
-<p>FRL eligibility is often used as a proxy for economic disadvantage.
-Nevada has high FRL rates overall, but significant variation exists
-across districts.</p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<p>FRL eligibility is a proxy for economic disadvantage. Many charter
+schools report 100% FRL, along with two rural counties (Esmeralda and
+Pershing). The variation across districts is enormous.</p>
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">frl_data</span> <span class="op">&lt;-</span> <span class="va">enr_2026</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"frl"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>pct_display <span class="op">=</span> <span class="va">pct</span> <span class="op">*</span> <span class="fl">100</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"free_reduced_lunch"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>pct_display <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">pct</span> <span class="op">*</span> <span class="fl">100</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">desc</a></span><span class="op">(</span><span class="va">pct</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">15</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">district_name</span>, <span class="va">n_students</span>, <span class="va">pct_display</span><span class="op">)</span></span>
 <span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">frl_data</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span></span>
 <span><span class="va">frl_data</span></span>
-<span><span class="co">#&gt; [1] district_name n_students    pct_display  </span></span>
-<span><span class="co">#&gt; &lt;0 rows&gt; (or 0-length row.names)</span></span></code></pre></div>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<span><span class="co">#&gt;                               district_name n_students pct_display</span></span>
+<span><span class="co">#&gt; 1          Esmeralda County School District         69         100</span></span>
+<span><span class="co">#&gt; 2           Pershing County School District        647         100</span></span>
+<span><span class="co">#&gt; 3                            Futuro Academy        484         100</span></span>
+<span><span class="co">#&gt; 4          Mater Academy of Northern Nevada        514         100</span></span>
+<span><span class="co">#&gt; 5                            Democracy Prep        927         100</span></span>
+<span><span class="co">#&gt; 6  Sports Leadership and Management Academy       1988         100</span></span>
+<span><span class="co">#&gt; 7                            Equipo Academy        949         100</span></span>
+<span><span class="co">#&gt; 8                   Mater Academy of Nevada       5297         100</span></span>
+<span><span class="co">#&gt; 9     Rainbow Dreams Early Learning Academy        229         100</span></span>
+<span><span class="co">#&gt; 10                        The Delta Academy       1315         100</span></span>
+<span><span class="co">#&gt; 11 Innovations International Charter School        619         100</span></span>
+<span><span class="co">#&gt; 12                            Quest Academy        415         100</span></span>
+<span><span class="co">#&gt; 13                        FuturEdge Academy        318         100</span></span>
+<span><span class="co">#&gt; 14       Southern Nevada Trades High School        250         100</span></span>
+<span><span class="co">#&gt; 15                      Vegas Vista Academy        270         100</span></span></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">frl_data</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>district_name <span class="op">=</span> <span class="fu">forcats</span><span class="fu">::</span><span class="fu"><a href="https://forcats.tidyverse.org/reference/fct_reorder.html" class="external-link">fct_reorder</a></span><span class="op">(</span><span class="va">district_name</span>, <span class="va">pct_display</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">pct_display</span>, y <span class="op">=</span> <span class="va">district_name</span>, fill <span class="op">=</span> <span class="va">pct_display</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
@@ -570,7 +661,7 @@ across districts.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_gradient.html" class="external-link">scale_fill_gradient</a></span><span class="op">(</span>low <span class="op">=</span> <span class="st">"#66B2FF"</span>, high <span class="op">=</span> <span class="st">"#BF0A30"</span>, guide <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span></span>
 <span>    title <span class="op">=</span> <span class="st">"Free/Reduced Lunch Eligibility by District (2026)"</span>,</span>
-<span>    subtitle <span class="op">=</span> <span class="st">"Top 15 districts by FRL percentage"</span>,</span>
+<span>    subtitle <span class="op">=</span> <span class="st">"Top 15 districts by FRL percentage (includes charter schools)"</span>,</span>
 <span>    x <span class="op">=</span> <span class="st">"Percent FRL Eligible"</span>,</span>
 <span>    y <span class="op">=</span> <span class="cn">NULL</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
@@ -578,63 +669,79 @@ across districts.</p>
 <hr>
 </div>
 <div class="section level2">
-<h2 id="nevadas-smallest-districts">14. Nevada’s smallest districts<a class="anchor" aria-label="anchor" href="#nevadas-smallest-districts"></a>
+<h2 id="nevadas-smallest-leas-are-charter-schools-not-counties">14. Nevada’s smallest LEAs are charter schools, not counties<a class="anchor" aria-label="anchor" href="#nevadas-smallest-leas-are-charter-schools-not-counties"></a>
 </h2>
-<p>While Clark County dominates headlines, Nevada has many tiny rural
-districts. Some have fewer than 500 students total.</p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<p>While Esmeralda County (69 students) is the smallest county district,
+Nevada’s smallest LEAs are micro-charters. Nevada State High School II
+has just 18 students.</p>
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">smallest</span> <span class="op">&lt;-</span> <span class="va">enr_2026</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"total_enrollment"</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">n_students</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">district_name</span>, <span class="va">n_students</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">district_name</span>, <span class="va">n_students</span>, <span class="va">is_charter</span><span class="op">)</span></span>
 <span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">smallest</span><span class="op">)</span> <span class="op">==</span> <span class="fl">10</span><span class="op">)</span></span>
 <span><span class="va">smallest</span></span>
-<span><span class="co">#&gt;                                    district_name n_students</span></span>
-<span><span class="co">#&gt; 1                    Nevada State High School II         18</span></span>
-<span><span class="co">#&gt; 2                       Independence High School         37</span></span>
-<span><span class="co">#&gt; 3               Esmeralda County School District         69</span></span>
-<span><span class="co">#&gt; 4                  Nevada Classical Academy Elko         83</span></span>
-<span><span class="co">#&gt; 5  Young Women's Leadership Academy of Las Vegas        108</span></span>
-<span><span class="co">#&gt; 6                                Learning Bridge        171</span></span>
-<span><span class="co">#&gt; 7                               Davidson Academy        171</span></span>
-<span><span class="co">#&gt; 8             Do &amp; Be Arts Academy of Excellence        175</span></span>
-<span><span class="co">#&gt; 9                        Silver Sands Montessori        188</span></span>
-<span><span class="co">#&gt; 10                  Honors Academy of Literature        202</span></span></code></pre></div>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<span><span class="co">#&gt;                                    district_name n_students is_charter</span></span>
+<span><span class="co">#&gt; 1                    Nevada State High School II         18       TRUE</span></span>
+<span><span class="co">#&gt; 2                       Independence High School         37      FALSE</span></span>
+<span><span class="co">#&gt; 3               Esmeralda County School District         69      FALSE</span></span>
+<span><span class="co">#&gt; 4                  Nevada Classical Academy Elko         83       TRUE</span></span>
+<span><span class="co">#&gt; 5  Young Women's Leadership Academy of Las Vegas        108       TRUE</span></span>
+<span><span class="co">#&gt; 6                                Learning Bridge        171       TRUE</span></span>
+<span><span class="co">#&gt; 7                               Davidson Academy        171      FALSE</span></span>
+<span><span class="co">#&gt; 8             Do &amp; Be Arts Academy of Excellence        175       TRUE</span></span>
+<span><span class="co">#&gt; 9                        Silver Sands Montessori        188       TRUE</span></span>
+<span><span class="co">#&gt; 10                  Honors Academy of Literature        202       TRUE</span></span></code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">smallest</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>district_name <span class="op">=</span> <span class="fu">forcats</span><span class="fu">::</span><span class="fu"><a href="https://forcats.tidyverse.org/reference/fct_reorder.html" class="external-link">fct_reorder</a></span><span class="op">(</span><span class="va">district_name</span>, <span class="va">n_students</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">n_students</span>, y <span class="op">=</span> <span class="va">district_name</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_col</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="st">"#336699"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>district_name <span class="op">=</span> <span class="fu">forcats</span><span class="fu">::</span><span class="fu"><a href="https://forcats.tidyverse.org/reference/fct_reorder.html" class="external-link">fct_reorder</a></span><span class="op">(</span><span class="va">district_name</span>, <span class="va">n_students</span><span class="op">)</span>,</span>
+<span>         sector <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">is_charter</span>, <span class="st">"Charter"</span>, <span class="st">"County District"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">n_students</span>, y <span class="op">=</span> <span class="va">district_name</span>, fill <span class="op">=</span> <span class="va">sector</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_col</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_text.html" class="external-link">geom_text</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>label <span class="op">=</span> <span class="fu">scales</span><span class="fu">::</span><span class="fu"><a href="https://scales.r-lib.org/reference/comma.html" class="external-link">comma</a></span><span class="op">(</span><span class="va">n_students</span><span class="op">)</span><span class="op">)</span>, hjust <span class="op">=</span> <span class="op">-</span><span class="fl">0.1</span>, size <span class="op">=</span> <span class="fl">3.5</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_x_continuous</a></span><span class="op">(</span>expand <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/expansion.html" class="external-link">expansion</a></span><span class="op">(</span>mult <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">0.2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_fill_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Charter"</span> <span class="op">=</span> <span class="st">"#E67300"</span>, <span class="st">"County District"</span> <span class="op">=</span> <span class="st">"#336699"</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span></span>
-<span>    title <span class="op">=</span> <span class="st">"Nevada's 10 Smallest Districts (2026)"</span>,</span>
-<span>    subtitle <span class="op">=</span> <span class="st">"Many rural counties have tiny school systems"</span>,</span>
+<span>    title <span class="op">=</span> <span class="st">"Nevada's 10 Smallest LEAs (2026)"</span>,</span>
+<span>    subtitle <span class="op">=</span> <span class="st">"Most are micro-charter schools, not county districts"</span>,</span>
 <span>    x <span class="op">=</span> <span class="st">"Total Enrollment"</span>,</span>
-<span>    y <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>    y <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>    fill <span class="op">=</span> <span class="cn">NULL</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
 <p><img src="enrollment_hooks_files/figure-html/smallest-chart-1.png" class="r-plt" alt="" width="768"></p>
 <hr>
 </div>
 <div class="section level2">
-<h2 id="iep-students-special-education-across-nevada">15. IEP students: Special education across Nevada<a class="anchor" aria-label="anchor" href="#iep-students-special-education-across-nevada"></a>
+<h2 id="lyon-county-has-the-highest-iep-rate-among-large-districts-at-17">15. Lyon County has the highest IEP rate among large districts at
+17%<a class="anchor" aria-label="anchor" href="#lyon-county-has-the-highest-iep-rate-among-large-districts-at-17"></a>
 </h2>
-<p>Students with Individualized Education Programs (IEPs) require
-specialized services. The distribution of IEP students varies by
-district.</p>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<p>Students with IEPs require specialized services. Clark County has the
+most IEP students by count (44,484), but Lyon County has the highest
+rate among sizable districts at 17%.</p>
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">iep_data</span> <span class="op">&lt;-</span> <span class="va">enr_2026</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"iep"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>pct_display <span class="op">=</span> <span class="va">pct</span> <span class="op">*</span> <span class="fl">100</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"special_ed"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>pct_display <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">pct</span> <span class="op">*</span> <span class="fl">100</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">desc</a></span><span class="op">(</span><span class="va">n_students</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">district_name</span>, <span class="va">n_students</span>, <span class="va">pct_display</span><span class="op">)</span></span>
 <span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">iep_data</span><span class="op">)</span> <span class="op">==</span> <span class="fl">10</span><span class="op">)</span></span>
 <span><span class="va">iep_data</span></span>
-<span><span class="co">#&gt; [1] district_name n_students    pct_display  </span></span>
-<span><span class="co">#&gt; &lt;0 rows&gt; (or 0-length row.names)</span></span></code></pre></div>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<span><span class="co">#&gt;                     district_name n_students pct_display</span></span>
+<span><span class="co">#&gt; 1    Clark County School District      44484        15.3</span></span>
+<span><span class="co">#&gt; 2   Washoe County School District      10537        16.6</span></span>
+<span><span class="co">#&gt; 3     Lyon County School District       1541        17.0</span></span>
+<span><span class="co">#&gt; 4   Somerset Academy of Las Vegas       1258        13.2</span></span>
+<span><span class="co">#&gt; 5     Elko County School District       1238        13.3</span></span>
+<span><span class="co">#&gt; 6     Carson City School District        943        13.0</span></span>
+<span><span class="co">#&gt; 7      Nye County School District        882        15.2</span></span>
+<span><span class="co">#&gt; 8     Pinecrest Academy of Nevada        840         9.9</span></span>
+<span><span class="co">#&gt; 9  Douglas County School District        692        14.6</span></span>
+<span><span class="co">#&gt; 10                  Doral Academy        674        10.5</span></span></code></pre></div>
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">iep_data</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>district_name <span class="op">=</span> <span class="fu">forcats</span><span class="fu">::</span><span class="fu"><a href="https://forcats.tidyverse.org/reference/fct_reorder.html" class="external-link">fct_reorder</a></span><span class="op">(</span><span class="va">district_name</span>, <span class="va">n_students</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">n_students</span>, y <span class="op">=</span> <span class="va">district_name</span>, fill <span class="op">=</span> <span class="va">pct_display</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
@@ -644,7 +751,7 @@ district.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html" class="external-link">scale_fill_viridis_c</a></span><span class="op">(</span>option <span class="op">=</span> <span class="st">"cividis"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span></span>
 <span>    title <span class="op">=</span> <span class="st">"Students with IEPs by District (2026)"</span>,</span>
-<span>    subtitle <span class="op">=</span> <span class="st">"Top 10 districts by IEP count; color shows percentage"</span>,</span>
+<span>    subtitle <span class="op">=</span> <span class="st">"Top 10 districts by IEP count; color shows IEP rate"</span>,</span>
 <span>    x <span class="op">=</span> <span class="st">"Number of IEP Students"</span>,</span>
 <span>    y <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>    fill <span class="op">=</span> <span class="st">"IEP %"</span></span>
@@ -653,19 +760,19 @@ district.</p>
 <hr>
 </div>
 <div class="section level2">
-<h2 id="summary-1">Summary<a class="anchor" aria-label="anchor" href="#summary-1"></a>
+<h2 id="summary">Summary<a class="anchor" aria-label="anchor" href="#summary"></a>
 </h2>
-<p>Nevada’s school enrollment data reveals: - <strong>Clark County
-dominance</strong>: Over 60% of students are in the Las Vegas metro -
-<strong>Demographic shift</strong>: Hispanic students are now the
-largest demographic group - <strong>Urban-rural divide</strong>: Rural
-Nevada has many districts but a tiny fraction of students -
-<strong>Charter growth</strong>: SPCSA schools are expanding their share
-of enrollment - <strong>Stabilization</strong>: After decades of growth,
-enrollment has plateaued - <strong>Economic need</strong>: High FRL
-rates across most districts indicate widespread economic challenges -
-<strong>K enrollment</strong>: Kindergarten numbers signal future
-enrollment trends</p>
+<p>Nevada’s school enrollment data reveals: - <strong>Declining
+enrollment</strong>: The state lost 13,000 students from 2021 to 2026 -
+<strong>Clark County losses</strong>: The Las Vegas metro lost 27,706
+students (8.7%) in 5 years - <strong>Charter boom</strong>: SPCSA
+schools grew 33%, adding 17,311 students since 2021 -
+<strong>Demographic shift</strong>: Hispanic students are 45.9% of
+enrollment, up from 43% in 2021 - <strong>Urban concentration</strong>:
+75% of students are in Las Vegas or Reno metro areas - <strong>Economic
+need</strong>: Many charter schools and rural counties report near-100%
+FRL - <strong>K volatility</strong>: Kindergarten enrollment swung from
++8% to -9% year-over-year</p>
 <p>These patterns shape school funding debates and facility planning
 across the Silver State.</p>
 <hr>
@@ -676,7 +783,7 @@ Data</a>.</em></p>
 <div class="section level2">
 <h2 id="session-info">Session Info<a class="anchor" aria-label="anchor" href="#session-info"></a>
 </h2>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; R version 4.5.2 (2025-10-31)</span></span>
 <span><span class="co">#&gt; Platform: x86_64-pc-linux-gnu</span></span>
