@@ -305,7 +305,8 @@ grade_data <- enr_2026 |>
   group_by(grade_level) |>
   summarize(n_students = sum(n_students, na.rm = TRUE), .groups = "drop") |>
   mutate(grade_level = factor(grade_level, levels = c("PK", "K", sprintf("%02d", 1:12)))) |>
-  filter(!is.na(grade_level))
+  filter(!is.na(grade_level)) |>
+  arrange(grade_level)
 
 stopifnot(nrow(grade_data) > 0)
 grade_data

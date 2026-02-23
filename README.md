@@ -211,16 +211,16 @@ charter_trend |> select(end_year, sector, students, n_districts)
 #> # A tibble: 10 x 4
 #>    end_year sector      students n_districts
 #>       <dbl> <chr>          <dbl>       <int>
-#>  1     2021 Charter        53223          37
-#>  2     2021 Traditional   433410          19
-#>  3     2022 Charter        55415          38
-#>  4     2022 Traditional   436923          19
-#>  5     2023 Charter        59670          43
-#>  6     2023 Traditional   429927          19
-#>  7     2024 Charter        61883          44
-#>  8     2024 Traditional   423687          19
-#>  9     2026 Charter        70534          51
-#> 10     2026 Traditional   403123          19
+#>  1     2021 Traditional   433410          19
+#>  2     2021 Charter        53223          37
+#>  3     2022 Traditional   436923          19
+#>  4     2022 Charter        55415          38
+#>  5     2023 Traditional   429927          19
+#>  6     2023 Charter        59670          43
+#>  7     2024 Traditional   423687          19
+#>  8     2024 Charter        61883          44
+#>  9     2026 Traditional   403123          19
+#> 10     2026 Charter        70534          51
 ```
 
 ![Charter vs traditional enrollment trends](https://almartin82.github.io/nvschooldata/articles/enrollment_hooks_files/figure-html/charter-chart-1.png)
@@ -267,7 +267,8 @@ grade_data <- enr_2026 |>
   group_by(grade_level) |>
   summarize(n_students = sum(n_students, na.rm = TRUE), .groups = "drop") |>
   mutate(grade_level = factor(grade_level, levels = c("PK", "K", sprintf("%02d", 1:12)))) |>
-  filter(!is.na(grade_level))
+  filter(!is.na(grade_level)) |>
+  arrange(grade_level)
 
 stopifnot(nrow(grade_data) > 0)
 grade_data

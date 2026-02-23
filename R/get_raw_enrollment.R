@@ -150,12 +150,18 @@ get_raw_enr_modern <- function(end_year) {
     # Read school level totals (has demographics and special populations)
     school_totals <- tryCatch({
       readxl::read_excel(tname, sheet = "School Level Totals")
-    }, error = function(e) NULL)
+    }, error = function(e) {
+      warning("Could not read 'School Level Totals' sheet for year ", end_year, ": ", e$message)
+      NULL
+    })
 
     # Read school grade subgroups (has grade-level detail)
     school_grades <- tryCatch({
       readxl::read_excel(tname, sheet = "School Grade Subgroups Data")
-    }, error = function(e) NULL)
+    }, error = function(e) {
+      warning("Could not read 'School Grade Subgroups Data' sheet for year ", end_year, ": ", e$message)
+      NULL
+    })
 
     # Read district data - prefer District Level Totals first, then subgroups
     district_data <- tryCatch({
@@ -174,7 +180,10 @@ get_raw_enr_modern <- function(end_year) {
           NULL
         }
       }
-    }, error = function(e) NULL)
+    }, error = function(e) {
+      warning("Could not read district data sheet for year ", end_year, ": ", e$message)
+      NULL
+    })
 
     list(
       school_totals = school_totals,
@@ -239,7 +248,10 @@ get_raw_enr_intermediate <- function(end_year) {
       } else {
         NULL
       }
-    }, error = function(e) NULL)
+    }, error = function(e) {
+      warning("Could not read school grade sheet for year ", end_year, ": ", e$message)
+      NULL
+    })
 
     # School totals
     school_totals <- tryCatch({
@@ -249,7 +261,10 @@ get_raw_enr_intermediate <- function(end_year) {
       } else {
         NULL
       }
-    }, error = function(e) NULL)
+    }, error = function(e) {
+      warning("Could not read school totals sheet for year ", end_year, ": ", e$message)
+      NULL
+    })
 
     # District totals
     district_data <- tryCatch({
@@ -259,7 +274,10 @@ get_raw_enr_intermediate <- function(end_year) {
       } else {
         NULL
       }
-    }, error = function(e) NULL)
+    }, error = function(e) {
+      warning("Could not read district data sheet for year ", end_year, ": ", e$message)
+      NULL
+    })
 
     list(
       school_totals = school_totals,
@@ -323,7 +341,10 @@ get_raw_enr_legacy <- function(end_year) {
       } else {
         NULL
       }
-    }, error = function(e) NULL)
+    }, error = function(e) {
+      warning("Could not read state data sheet for year ", end_year, ": ", e$message)
+      NULL
+    })
 
     # District race/ethnicity by grade (consolidated sheet)
     district_grade_data <- tryCatch({
@@ -333,7 +354,10 @@ get_raw_enr_legacy <- function(end_year) {
       } else {
         NULL
       }
-    }, error = function(e) NULL)
+    }, error = function(e) {
+      warning("Could not read district race data sheet for year ", end_year, ": ", e$message)
+      NULL
+    })
 
     # Note: Legacy format has individual district sheets (CCSD, WCSD, etc.)
     # These would need to be combined for complete school-level data
@@ -389,11 +413,17 @@ import_local_enrollment <- function(file_path, end_year) {
   if (format_type == "modern") {
     school_totals <- tryCatch({
       readxl::read_excel(file_path, sheet = "School Level Totals")
-    }, error = function(e) NULL)
+    }, error = function(e) {
+      warning("Could not read 'School Level Totals' from ", file_path, ": ", e$message)
+      NULL
+    })
 
     school_grades <- tryCatch({
       readxl::read_excel(file_path, sheet = "School Grade Subgroups Data")
-    }, error = function(e) NULL)
+    }, error = function(e) {
+      warning("Could not read 'School Grade Subgroups Data' from ", file_path, ": ", e$message)
+      NULL
+    })
 
     # Prefer District Level Totals sheet
     district_data <- tryCatch({
@@ -408,7 +438,10 @@ import_local_enrollment <- function(file_path, end_year) {
           NULL
         }
       }
-    }, error = function(e) NULL)
+    }, error = function(e) {
+      warning("Could not read district data from ", file_path, ": ", e$message)
+      NULL
+    })
 
     result <- list(
       school_totals = school_totals,
@@ -426,7 +459,10 @@ import_local_enrollment <- function(file_path, end_year) {
       } else {
         NULL
       }
-    }, error = function(e) NULL)
+    }, error = function(e) {
+      warning("Could not read school grade sheet from ", file_path, ": ", e$message)
+      NULL
+    })
 
     school_totals <- tryCatch({
       total_sheet <- grep("School.*Total|Totals", sheets, value = TRUE, ignore.case = TRUE)
@@ -435,7 +471,10 @@ import_local_enrollment <- function(file_path, end_year) {
       } else {
         NULL
       }
-    }, error = function(e) NULL)
+    }, error = function(e) {
+      warning("Could not read school totals sheet from ", file_path, ": ", e$message)
+      NULL
+    })
 
     district_data <- tryCatch({
       dist_sheet <- grep("District", sheets, value = TRUE, ignore.case = TRUE)
@@ -444,7 +483,10 @@ import_local_enrollment <- function(file_path, end_year) {
       } else {
         NULL
       }
-    }, error = function(e) NULL)
+    }, error = function(e) {
+      warning("Could not read district data sheet from ", file_path, ": ", e$message)
+      NULL
+    })
 
     result <- list(
       school_totals = school_totals,
