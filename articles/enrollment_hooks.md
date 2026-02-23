@@ -389,27 +389,28 @@ grade_data <- enr_2026 |>
   group_by(grade_level) |>
   summarize(n_students = sum(n_students, na.rm = TRUE), .groups = "drop") |>
   mutate(grade_level = factor(grade_level, levels = c("PK", "K", sprintf("%02d", 1:12)))) |>
-  filter(!is.na(grade_level))
+  filter(!is.na(grade_level)) |>
+  arrange(grade_level)
 
 stopifnot(nrow(grade_data) > 0)
 grade_data
 #> # A tibble: 14 × 2
 #>    grade_level n_students
 #>    <fct>            <dbl>
-#>  1 01               31486
-#>  2 02               30265
-#>  3 03               33417
-#>  4 04               35890
-#>  5 05               34847
-#>  6 06               35814
-#>  7 07               36276
-#>  8 08               36577
-#>  9 09               37251
-#> 10 10               37010
-#> 11 11               37217
-#> 12 12               37730
-#> 13 K                30490
-#> 14 PK               13852
+#>  1 PK               13852
+#>  2 K                30490
+#>  3 01               31486
+#>  4 02               30265
+#>  5 03               33417
+#>  6 04               35890
+#>  7 05               34847
+#>  8 06               35814
+#>  9 07               36276
+#> 10 08               36577
+#> 11 09               37251
+#> 12 10               37010
+#> 13 11               37217
+#> 14 12               37730
 ```
 
 ``` r

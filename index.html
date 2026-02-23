@@ -254,16 +254,16 @@
 <span><span class="co">#&gt; # A tibble: 10 x 4</span></span>
 <span><span class="co">#&gt;    end_year sector      students n_districts</span></span>
 <span><span class="co">#&gt;       &lt;dbl&gt; &lt;chr&gt;          &lt;dbl&gt;       &lt;int&gt;</span></span>
-<span><span class="co">#&gt;  1     2021 Charter        53223          37</span></span>
-<span><span class="co">#&gt;  2     2021 Traditional   433410          19</span></span>
-<span><span class="co">#&gt;  3     2022 Charter        55415          38</span></span>
-<span><span class="co">#&gt;  4     2022 Traditional   436923          19</span></span>
-<span><span class="co">#&gt;  5     2023 Charter        59670          43</span></span>
-<span><span class="co">#&gt;  6     2023 Traditional   429927          19</span></span>
-<span><span class="co">#&gt;  7     2024 Charter        61883          44</span></span>
-<span><span class="co">#&gt;  8     2024 Traditional   423687          19</span></span>
-<span><span class="co">#&gt;  9     2026 Charter        70534          51</span></span>
-<span><span class="co">#&gt; 10     2026 Traditional   403123          19</span></span></code></pre></div>
+<span><span class="co">#&gt;  1     2021 Traditional   433410          19</span></span>
+<span><span class="co">#&gt;  2     2021 Charter        53223          37</span></span>
+<span><span class="co">#&gt;  3     2022 Traditional   436923          19</span></span>
+<span><span class="co">#&gt;  4     2022 Charter        55415          38</span></span>
+<span><span class="co">#&gt;  5     2023 Traditional   429927          19</span></span>
+<span><span class="co">#&gt;  6     2023 Charter        59670          43</span></span>
+<span><span class="co">#&gt;  7     2024 Traditional   423687          19</span></span>
+<span><span class="co">#&gt;  8     2024 Charter        61883          44</span></span>
+<span><span class="co">#&gt;  9     2026 Traditional   403123          19</span></span>
+<span><span class="co">#&gt; 10     2026 Charter        70534          51</span></span></code></pre></div>
 <div class="float">
 <img src="https://almartin82.github.io/nvschooldata/articles/enrollment_hooks_files/figure-html/charter-chart-1.png" alt="Charter vs traditional enrollment trends"><div class="figcaption">Charter vs traditional enrollment trends</div>
 </div>
@@ -308,7 +308,8 @@
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">grade_level</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span>n_students <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">n_students</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, .groups <span class="op">=</span> <span class="st">"drop"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>grade_level <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">grade_level</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"PK"</span>, <span class="st">"K"</span>, <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"%02d"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">12</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">grade_level</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">grade_level</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">grade_level</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">grade_data</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span></span>
 <span><span class="va">grade_data</span></span>
