@@ -5,8 +5,10 @@ knitr::opts_chunk$set(
   message = FALSE,
   warning = FALSE,
   fig.width = 8,
-  fig.height = 5
+  fig.height = 5,
+  cache = TRUE
 )
+
 
 ## ----load-packages------------------------------------------------------------
 library(nvschooldata)
@@ -16,9 +18,10 @@ library(ggplot2)
 
 theme_set(theme_minimal(base_size = 14))
 
+
 ## ----statewide-trend----------------------------------------------------------
 # Note: 2025 data temporarily unavailable from NDE
-enr <- fetch_enr_multi(c(2021:2024, 2026))
+enr <- fetch_enr_multi(c(2021:2024, 2026), use_cache = TRUE)
 
 state_totals <- enr |>
   filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL") |>
@@ -27,56 +30,71 @@ state_totals <- enr |>
   mutate(change = n_students - lag(n_students),
          pct_change = round(change / lag(n_students) * 100, 2))
 
+stopifnot(nrow(state_totals) > 0)
 state_totals
+
 
 ## ----statewide-chart----------------------------------------------------------
 ggplot(state_totals, aes(x = end_year, y = n_students)) +
   geom_line(linewidth = 1.2, color = "#003366") +
   geom_point(size = 3, color = "#003366") +
+  annotate("rect", xmin = 2020.5, xmax = 2022.5, ymin = -Inf, ymax = Inf,
+           alpha = 0.1, fill = "red") +
+  annotate("text", x = 2021.5, y = max(state_totals$n_students) + 2000,
+           label = "COVID era", size = 3, color = "red3") +
   scale_y_continuous(labels = scales::comma) +
   labs(
     title = "Nevada Public School Enrollment (2021-2026)",
-    subtitle = "Enrollment has stabilized after years of rapid growth",
+    subtitle = "Enrollment peaked in 2022 and has declined since",
     x = "School Year (ending)",
     y = "Total Enrollment"
   )
 
+
 ## ----top-districts------------------------------------------------------------
-enr_2026 <- fetch_enr(2026)
+enr_2026 <- fetch_enr(2026, use_cache = TRUE)
 
 top_districts <- enr_2026 |>
   filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL") |>
   arrange(desc(n_students)) |>
   head(10) |>
-  select(district_name, n_students)
+  select(district_name, n_students, is_charter)
 
+stopifnot(nrow(top_districts) == 10)
 top_districts
+
 
 ## ----top-districts-chart------------------------------------------------------
 top_districts |>
-  mutate(district_name = forcats::fct_reorder(district_name, n_students)) |>
-  ggplot(aes(x = n_students, y = district_name, fill = district_name)) +
-  geom_col(show.legend = FALSE) +
+  mutate(district_name = forcats::fct_reorder(district_name, n_students),
+         sector = ifelse(is_charter, "Charter", "County District")) |>
+  ggplot(aes(x = n_students, y = district_name, fill = sector)) +
+  geom_col() +
   geom_text(aes(label = scales::comma(n_students)), hjust = -0.1, size = 3.5) +
   scale_x_continuous(labels = scales::comma, expand = expansion(mult = c(0, 0.15))) +
-  scale_fill_viridis_d(option = "mako", begin = 0.2, end = 0.8) +
+  scale_fill_manual(values = c("Charter" = "#E67300", "County District" = "#003366")) +
   labs(
     title = "Top 10 Nevada Districts by Enrollment (2026)",
-    subtitle = "Clark County dominates, followed by Washoe County (Reno)",
+    subtitle = "Charter networks now rival mid-size county districts",
     x = "Number of Students",
-    y = NULL
+    y = NULL,
+    fill = NULL
   )
+
 
 ## ----demographics-------------------------------------------------------------
 demographics <- enr_2026 |>
   filter(is_district, grade_level == "TOTAL",
-         subgroup %in% c("white", "black", "hispanic", "asian", "native_american", "multiracial")) |>
+         subgroup %in% c("white", "black", "hispanic", "asian",
+                         "native_american", "multiracial", "pacific_islander")) |>
   group_by(subgroup) |>
   summarize(n_students = sum(n_students, na.rm = TRUE), .groups = "drop") |>
   mutate(pct = round(n_students / sum(n_students) * 100, 1)) |>
   arrange(desc(n_students))
 
+stopifnot(nrow(demographics) == 7)
 demographics
+
 
 ## ----demographics-chart-------------------------------------------------------
 demographics |>
@@ -88,10 +106,11 @@ demographics |>
   scale_fill_brewer(palette = "Set2") +
   labs(
     title = "Nevada Student Demographics (2026)",
-    subtitle = "Hispanic students are now the largest group",
+    subtitle = "Hispanic students are the largest group at 45.9%",
     x = "Number of Students",
     y = NULL
   )
+
 
 ## ----regional-----------------------------------------------------------------
 regional <- enr_2026 |>
@@ -99,39 +118,41 @@ regional <- enr_2026 |>
   mutate(region = case_when(
     grepl("Clark", district_name) ~ "Las Vegas Metro",
     grepl("Washoe", district_name) ~ "Reno Metro",
-    TRUE ~ "Rural Nevada"
+    TRUE ~ "Rest of Nevada"
   )) |>
   group_by(region) |>
   summarize(
-    n_districts = n_distinct(district_name),
+    n_entities = n_distinct(district_name),
     total_enrollment = sum(n_students, na.rm = TRUE),
     .groups = "drop"
   ) |>
   mutate(pct = round(total_enrollment / sum(total_enrollment) * 100, 1))
 
+stopifnot(nrow(regional) == 3)
 regional
+
 
 ## ----regional-chart-----------------------------------------------------------
 regional |>
-  mutate(region = factor(region, levels = c("Las Vegas Metro", "Reno Metro", "Rural Nevada"))) |>
+  mutate(region = factor(region, levels = c("Las Vegas Metro", "Reno Metro", "Rest of Nevada"))) |>
   ggplot(aes(x = region, y = total_enrollment, fill = region)) +
   geom_col(show.legend = FALSE) +
   geom_text(aes(label = paste0(scales::comma(total_enrollment), "\n(", pct, "%)")),
             vjust = -0.2, size = 4) +
   scale_y_continuous(labels = scales::comma, expand = expansion(mult = c(0, 0.15))) +
-  scale_fill_manual(values = c("Las Vegas Metro" = "#003366", "Reno Metro" = "#0066CC", "Rural Nevada" = "#66B2FF")) +
+  scale_fill_manual(values = c("Las Vegas Metro" = "#003366", "Reno Metro" = "#0066CC", "Rest of Nevada" = "#66B2FF")) +
   labs(
     title = "Enrollment by Region (2026)",
-    subtitle = "Las Vegas dominates Nevada education",
+    subtitle = "Las Vegas dominates; 'Rest of Nevada' includes rural counties and charters",
     x = NULL,
     y = "Number of Students"
   )
 
-## ----growth-chart-------------------------------------------------------------
+
+## ----growth-data--------------------------------------------------------------
 growth_data <- enr |>
   filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL",
          grepl("Clark|Washoe", district_name)) |>
-  # Normalize district names (format changed across years)
   mutate(county = case_when(
     grepl("Clark", district_name) ~ "Clark County",
     grepl("Washoe", district_name) ~ "Washoe County"
@@ -139,34 +160,309 @@ growth_data <- enr |>
   group_by(county, end_year) |>
   summarize(n_students = sum(n_students, na.rm = TRUE), .groups = "drop") |>
   group_by(county) |>
-  mutate(index = n_students / first(n_students) * 100) |>
+  mutate(index = round(n_students / first(n_students) * 100, 1)) |>
   ungroup()
 
+stopifnot(nrow(growth_data) > 0)
+growth_data
+
+
+## ----growth-chart-------------------------------------------------------------
 ggplot(growth_data, aes(x = end_year, y = index, color = county)) +
   geom_line(linewidth = 1.2) +
   geom_point(size = 2) +
   geom_hline(yintercept = 100, linetype = "dashed", color = "gray50") +
+  annotate("rect", xmin = 2020.5, xmax = 2022.5, ymin = -Inf, ymax = Inf,
+           alpha = 0.1, fill = "red") +
   scale_color_manual(values = c("Clark County" = "#BF0A30", "Washoe County" = "#002868")) +
   labs(
     title = "Clark vs Washoe County Enrollment Trends",
-    subtitle = "Indexed to 2021 = 100",
+    subtitle = "Indexed to 2021 = 100. Clark declining much faster than Washoe.",
     x = "School Year",
     y = "Enrollment Index (2021 = 100)",
     color = "District"
   )
 
-## ----charters-----------------------------------------------------------------
-charter_enr <- enr_2026 |>
-  filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL") |>
-  mutate(is_charter = grepl("SPCSA|Charter", district_name, ignore.case = TRUE)) |>
-  group_by(is_charter) |>
-  summarize(
-    students = sum(n_students, na.rm = TRUE),
-    districts = n(),
-    .groups = "drop"
-  ) |>
-  mutate(sector = ifelse(is_charter, "Charter (SPCSA)", "Traditional Districts"))
 
-charter_enr |>
-  select(sector, students, districts)
+## ----charter-trend------------------------------------------------------------
+charter_trend <- enr |>
+  filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL") |>
+  group_by(end_year, is_charter) |>
+  summarize(students = sum(n_students, na.rm = TRUE),
+            n_districts = n(), .groups = "drop") |>
+  mutate(sector = ifelse(is_charter, "Charter", "Traditional"))
+
+stopifnot(nrow(charter_trend) > 0)
+charter_trend |> select(end_year, sector, students, n_districts)
+
+
+## ----charter-chart------------------------------------------------------------
+ggplot(charter_trend, aes(x = end_year, y = students, color = sector)) +
+  geom_line(linewidth = 1.2) +
+  geom_point(size = 2) +
+  annotate("rect", xmin = 2020.5, xmax = 2022.5, ymin = -Inf, ymax = Inf,
+           alpha = 0.1, fill = "red") +
+  scale_y_continuous(labels = scales::comma) +
+  scale_color_manual(values = c("Charter" = "#E67300", "Traditional" = "#003366")) +
+  labs(
+    title = "Charter vs Traditional Enrollment Trends (2021-2026)",
+    subtitle = "Charters grew 33% while traditional districts declined 7%",
+    x = "School Year (ending)",
+    y = "Number of Students",
+    color = "Sector"
+  )
+
+
+## ----washoe-------------------------------------------------------------------
+washoe_data <- enr |>
+  filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL",
+         grepl("Washoe", district_name)) |>
+  group_by(end_year) |>
+  summarize(n_students = sum(n_students, na.rm = TRUE), .groups = "drop") |>
+  mutate(change = n_students - lag(n_students),
+         pct_change = round(change / lag(n_students) * 100, 2))
+
+stopifnot(nrow(washoe_data) > 0)
+washoe_data
+
+
+## ----washoe-chart-------------------------------------------------------------
+ggplot(washoe_data, aes(x = end_year, y = n_students)) +
+  geom_line(linewidth = 1.2, color = "#002868") +
+  geom_point(size = 3, color = "#002868") +
+  scale_y_continuous(labels = scales::comma, limits = c(0, NA)) +
+  labs(
+    title = "Washoe County School District Enrollment",
+    subtitle = "Reno-Sparks metro area trends (2021-2026)",
+    x = "School Year (ending)",
+    y = "Total Enrollment"
+  )
+
+
+## ----grade-levels-------------------------------------------------------------
+grade_data <- enr_2026 |>
+  filter(is_school, subgroup == "total_enrollment",
+         !grade_level %in% c("TOTAL", "UG", "AD")) |>
+  group_by(grade_level) |>
+  summarize(n_students = sum(n_students, na.rm = TRUE), .groups = "drop") |>
+  mutate(grade_level = factor(grade_level, levels = c("PK", "K", sprintf("%02d", 1:12)))) |>
+  filter(!is.na(grade_level))
+
+stopifnot(nrow(grade_data) > 0)
+grade_data
+
+
+## ----grade-chart--------------------------------------------------------------
+ggplot(grade_data, aes(x = grade_level, y = n_students, fill = grade_level)) +
+  geom_col(show.legend = FALSE) +
+  scale_y_continuous(labels = scales::comma) +
+  scale_fill_viridis_d(option = "viridis") +
+  labs(
+    title = "Nevada Enrollment by Grade Level (2026)",
+    subtitle = "School-level aggregation across all districts",
+    x = "Grade Level",
+    y = "Number of Students"
+  )
+
+
+## ----gender-------------------------------------------------------------------
+gender_data <- enr_2026 |>
+  filter(is_district, grade_level == "TOTAL",
+         subgroup %in% c("male", "female")) |>
+  group_by(subgroup) |>
+  summarize(n_students = sum(n_students, na.rm = TRUE), .groups = "drop") |>
+  mutate(pct = round(n_students / sum(n_students) * 100, 1))
+
+stopifnot(nrow(gender_data) == 2)
+gender_data
+
+
+## ----gender-chart-------------------------------------------------------------
+ggplot(gender_data, aes(x = subgroup, y = n_students, fill = subgroup)) +
+  geom_col(show.legend = FALSE) +
+  geom_text(aes(label = paste0(scales::comma(n_students), "\n(", pct, "%)")),
+            vjust = -0.2, size = 4) +
+  scale_y_continuous(labels = scales::comma, expand = expansion(mult = c(0, 0.15))) +
+  scale_fill_manual(values = c("female" = "#CC3366", "male" = "#336699")) +
+  labs(
+    title = "Nevada Enrollment by Gender (2026)",
+    subtitle = "Statewide male/female distribution",
+    x = NULL,
+    y = "Number of Students"
+  )
+
+
+## ----special-populations------------------------------------------------------
+special_pops <- enr_2026 |>
+  filter(is_district, grade_level == "TOTAL",
+         subgroup %in% c("frl", "iep", "el"),
+         grepl("Clark|Washoe", district_name)) |>
+  mutate(county = ifelse(grepl("Clark", district_name), "Clark County", "Washoe County")) |>
+  group_by(county, subgroup) |>
+  summarize(n_students = sum(n_students, na.rm = TRUE), .groups = "drop")
+
+stopifnot(nrow(special_pops) == 6)
+special_pops
+
+
+## ----special-pops-chart-------------------------------------------------------
+ggplot(special_pops, aes(x = subgroup, y = n_students, fill = county)) +
+  geom_col(position = "dodge") +
+  geom_text(aes(label = scales::comma(n_students)),
+            position = position_dodge(width = 0.9), vjust = -0.2, size = 3) +
+  scale_y_continuous(labels = scales::comma, expand = expansion(mult = c(0, 0.15))) +
+  scale_fill_manual(values = c("Clark County" = "#BF0A30", "Washoe County" = "#002868")) +
+  scale_x_discrete(labels = c("el" = "English\nLearners", "frl" = "Free/Reduced\nLunch", "iep" = "Students\nwith IEPs")) +
+  labs(
+    title = "Special Populations: Clark vs Washoe County (2026)",
+    subtitle = "EL, FRL, and IEP student counts",
+    x = NULL,
+    y = "Number of Students",
+    fill = "District"
+  )
+
+
+## ----kindergarten-------------------------------------------------------------
+k_data <- enr |>
+  filter(is_school, subgroup == "total_enrollment", grade_level == "K") |>
+  group_by(end_year) |>
+  summarize(k_students = sum(n_students, na.rm = TRUE), .groups = "drop") |>
+  mutate(change = k_students - lag(k_students),
+         pct_change = round(change / lag(k_students) * 100, 2))
+
+stopifnot(nrow(k_data) > 0)
+k_data
+
+
+## ----kindergarten-chart-------------------------------------------------------
+ggplot(k_data, aes(x = end_year, y = k_students)) +
+  geom_line(linewidth = 1.2, color = "#E67300") +
+  geom_point(size = 3, color = "#E67300") +
+  annotate("rect", xmin = 2020.5, xmax = 2022.5, ymin = -Inf, ymax = Inf,
+           alpha = 0.1, fill = "red") +
+  scale_y_continuous(labels = scales::comma, limits = c(0, NA)) +
+  labs(
+    title = "Nevada Kindergarten Enrollment (2021-2026)",
+    subtitle = "K enrollment swings from post-COVID recovery to decline and back",
+    x = "School Year (ending)",
+    y = "Kindergarten Students"
+  )
+
+
+## ----el-district--------------------------------------------------------------
+el_data <- enr_2026 |>
+  filter(is_district, grade_level == "TOTAL", subgroup == "el") |>
+  arrange(desc(n_students)) |>
+  head(10) |>
+  select(district_name, n_students, pct)
+
+stopifnot(nrow(el_data) == 10)
+el_data
+
+
+## ----el-chart-----------------------------------------------------------------
+el_data |>
+  mutate(district_name = forcats::fct_reorder(district_name, n_students)) |>
+  ggplot(aes(x = n_students, y = district_name, fill = pct)) +
+  geom_col() +
+  geom_text(aes(label = scales::percent(pct, accuracy = 0.1)), hjust = -0.1, size = 3) +
+  scale_x_continuous(labels = scales::comma, expand = expansion(mult = c(0, 0.2))) +
+  scale_fill_viridis_c(option = "plasma", labels = scales::percent) +
+  labs(
+    title = "English Learner Enrollment by District (2026)",
+    subtitle = "Top 10 districts by EL count; color shows percentage of total enrollment",
+    x = "Number of EL Students",
+    y = NULL,
+    fill = "EL %"
+  )
+
+
+## ----frl----------------------------------------------------------------------
+frl_data <- enr_2026 |>
+  filter(is_district, grade_level == "TOTAL", subgroup == "frl") |>
+  mutate(pct_display = round(pct * 100, 1)) |>
+  arrange(desc(pct)) |>
+  head(15) |>
+  select(district_name, n_students, pct_display)
+
+stopifnot(nrow(frl_data) > 0)
+frl_data
+
+
+## ----frl-chart----------------------------------------------------------------
+frl_data |>
+  mutate(district_name = forcats::fct_reorder(district_name, pct_display)) |>
+  ggplot(aes(x = pct_display, y = district_name, fill = pct_display)) +
+  geom_col() +
+  geom_text(aes(label = paste0(round(pct_display, 1), "%")), hjust = -0.1, size = 3) +
+  scale_x_continuous(expand = expansion(mult = c(0, 0.15))) +
+  scale_fill_gradient(low = "#66B2FF", high = "#BF0A30", guide = "none") +
+  labs(
+    title = "Free/Reduced Lunch Eligibility by District (2026)",
+    subtitle = "Top 15 districts by FRL percentage (includes charter schools)",
+    x = "Percent FRL Eligible",
+    y = NULL
+  )
+
+
+## ----smallest-----------------------------------------------------------------
+smallest <- enr_2026 |>
+  filter(is_district, subgroup == "total_enrollment", grade_level == "TOTAL") |>
+  arrange(n_students) |>
+  head(10) |>
+  select(district_name, n_students, is_charter)
+
+stopifnot(nrow(smallest) == 10)
+smallest
+
+
+## ----smallest-chart-----------------------------------------------------------
+smallest |>
+  mutate(district_name = forcats::fct_reorder(district_name, n_students),
+         sector = ifelse(is_charter, "Charter", "County District")) |>
+  ggplot(aes(x = n_students, y = district_name, fill = sector)) +
+  geom_col() +
+  geom_text(aes(label = scales::comma(n_students)), hjust = -0.1, size = 3.5) +
+  scale_x_continuous(expand = expansion(mult = c(0, 0.2))) +
+  scale_fill_manual(values = c("Charter" = "#E67300", "County District" = "#336699")) +
+  labs(
+    title = "Nevada's 10 Smallest LEAs (2026)",
+    subtitle = "Most are micro-charter schools, not county districts",
+    x = "Total Enrollment",
+    y = NULL,
+    fill = NULL
+  )
+
+
+## ----iep----------------------------------------------------------------------
+iep_data <- enr_2026 |>
+  filter(is_district, grade_level == "TOTAL", subgroup == "iep") |>
+  mutate(pct_display = round(pct * 100, 1)) |>
+  arrange(desc(n_students)) |>
+  head(10) |>
+  select(district_name, n_students, pct_display)
+
+stopifnot(nrow(iep_data) == 10)
+iep_data
+
+
+## ----iep-chart----------------------------------------------------------------
+iep_data |>
+  mutate(district_name = forcats::fct_reorder(district_name, n_students)) |>
+  ggplot(aes(x = n_students, y = district_name, fill = pct_display)) +
+  geom_col() +
+  geom_text(aes(label = paste0(round(pct_display, 1), "%")), hjust = -0.1, size = 3) +
+  scale_x_continuous(labels = scales::comma, expand = expansion(mult = c(0, 0.15))) +
+  scale_fill_viridis_c(option = "cividis") +
+  labs(
+    title = "Students with IEPs by District (2026)",
+    subtitle = "Top 10 districts by IEP count; color shows IEP rate",
+    x = "Number of IEP Students",
+    y = NULL,
+    fill = "IEP %"
+  )
+
+
+## ----session-info-------------------------------------------------------------
+sessionInfo()
 
