@@ -326,7 +326,7 @@ English Learners, students with IEPs, and Free/Reduced Lunch eligible students r
 ```r
 special_pops <- enr_2026 |>
   filter(is_district, grade_level == "TOTAL",
-         subgroup %in% c("frl", "iep", "el"),
+         subgroup %in% c("free_reduced_lunch", "special_ed", "lep"),
          grepl("Clark|Washoe", district_name)) |>
   mutate(county = ifelse(grepl("Clark", district_name), "Clark County", "Washoe County")) |>
   group_by(county, subgroup) |>
@@ -335,14 +335,14 @@ special_pops <- enr_2026 |>
 stopifnot(nrow(special_pops) == 6)
 special_pops
 #> # A tibble: 6 x 3
-#>   county        subgroup n_students
-#>   <chr>         <chr>         <dbl>
-#> 1 Clark County  el            45993
-#> 2 Clark County  frl          282969
-#> 3 Clark County  iep           44484
-#> 4 Washoe County el             9229
-#> 5 Washoe County frl           39010
-#> 6 Washoe County iep           10537
+#>   county        subgroup           n_students
+#>   <chr>         <chr>                   <dbl>
+#> 1 Clark County  free_reduced_lunch     282969
+#> 2 Clark County  lep                     45993
+#> 3 Clark County  special_ed              44484
+#> 4 Washoe County free_reduced_lunch      39010
+#> 5 Washoe County lep                      9229
+#> 6 Washoe County special_ed              10537
 ```
 
 ![Special populations by district](https://almartin82.github.io/nvschooldata/articles/enrollment_hooks_files/figure-html/special-pops-chart-1.png)
@@ -383,7 +383,7 @@ English Learner populations vary dramatically. Clark County leads in absolute nu
 
 ```r
 el_data <- enr_2026 |>
-  filter(is_district, grade_level == "TOTAL", subgroup == "el") |>
+  filter(is_district, grade_level == "TOTAL", subgroup == "lep") |>
   arrange(desc(n_students)) |>
   head(10) |>
   select(district_name, n_students, pct)
@@ -415,7 +415,7 @@ FRL eligibility is a proxy for economic disadvantage. Many charter schools repor
 
 ```r
 frl_data <- enr_2026 |>
-  filter(is_district, grade_level == "TOTAL", subgroup == "frl") |>
+  filter(is_district, grade_level == "TOTAL", subgroup == "free_reduced_lunch") |>
   mutate(pct_display = round(pct * 100, 1)) |>
   arrange(desc(pct)) |>
   head(15) |>
@@ -485,7 +485,7 @@ Students with IEPs require specialized services. Clark County has the most IEP s
 
 ```r
 iep_data <- enr_2026 |>
-  filter(is_district, grade_level == "TOTAL", subgroup == "iep") |>
+  filter(is_district, grade_level == "TOTAL", subgroup == "special_ed") |>
   mutate(pct_display = round(pct * 100, 1)) |>
   arrange(desc(n_students)) |>
   head(10) |>
