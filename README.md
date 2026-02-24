@@ -89,9 +89,9 @@ top_districts
 
 ---
 
-### 3. Hispanic students are 46% of enrollment, up from 43% in 2021
+### 3. Hispanic students are 46% of Nevada enrollment, down slightly from 47% in 2021
 
-Hispanic students are the largest demographic group in Nevada public schools at 45.9%, followed by white students at 25.9%. This reflects a continuing demographic shift -- Hispanic share has grown each year.
+Hispanic students are the largest demographic group in Nevada public schools at 45.9%, followed by white students at 25.9%. Hispanic share dipped from 46.8% in 2021 to 45.9% in 2026, a modest decrease even as Hispanic students remain the largest group.
 
 ```r
 demographics <- enr_2026 |>
@@ -256,9 +256,9 @@ washoe_data
 
 ---
 
-### 8. 9th grade has the most students; PK has the fewest
+### 8. 12th grade has the most students; PK has the fewest
 
-Tracking enrollment by grade reveals a classic pattern: PK is small (13,852), enrollment jumps at K (30,490), and peaks in high school around 9th grade (37,251). Grade-level data is available at the school level.
+Tracking enrollment by grade reveals a classic pattern: PK is small (13,852), enrollment jumps at K (30,490), and peaks at 12th grade (37,730). Grade-level data is available at the school level.
 
 ```r
 grade_data <- enr_2026 |>
@@ -377,9 +377,9 @@ k_data
 
 ---
 
-### 12. Mater Academy has the highest EL concentration at 34%
+### 12. Futuro Academy has the highest EL concentration at 41%
 
-English Learner populations vary dramatically. Clark County leads in absolute numbers (45,993), but several charter schools have much higher EL concentrations. Mater Academy of Nevada has 34.3% EL students.
+English Learner populations vary dramatically. Clark County leads in absolute numbers (45,993), but several charter schools have much higher EL concentrations. Futuro Academy leads at 41.1% EL students, followed by Equipo Academy at 38.5%.
 
 ```r
 el_data <- enr_2026 |>
