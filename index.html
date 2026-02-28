@@ -56,21 +56,12 @@
 </h1></div>
 <!-- badges: start -->
 
-<p>Fetch and analyze Nevada school enrollment data from <a href="https://doe.nv.gov/offices/office-of-assessment-data-and-accountability-management-adam/accountability/data-requests/enrollment-for-nevada-public-schools" class="external-link">NVDOE</a> in R or Python.</p>
+<p>Nevada charter schools added 17,000 students since 2021 while traditional districts bled 30,000 – and the state’s kindergarten pipeline is swinging wildly year to year.</p>
+<p>Part of the <a href="https://github.com/almartin82/njschooldata" class="external-link">njschooldata</a> family of state education data packages.</p>
+<p><strong><a href="https://almartin82.github.io/nvschooldata/">Full documentation</a></strong> – all 15 stories with interactive charts, getting-started guide, and complete function reference.</p>
 <div class="section level2">
-<h2 id="why-nvschooldata">Why nvschooldata?<a class="anchor" aria-label="anchor" href="#why-nvschooldata"></a>
+<h2 id="highlights">Highlights<a class="anchor" aria-label="anchor" href="#highlights"></a>
 </h2>
-<p>This package is part of the <a href="https://github.com/almartin82/njschooldata" class="external-link">State Schooldata Project</a>, which provides simple, consistent interfaces for accessing state-published school data. The original <a href="https://github.com/almartin82/njschooldata" class="external-link">njschooldata</a> package for New Jersey inspired this 50-state effort to make state education data accessible without manual downloads or data wrangling.</p>
-<p><strong>What’s available:</strong> Enrollment data (2021-2026) covering 470,000+ students across 17 county school districts, Carson City, and 51 charter school operators under the State Public Charter School Authority (SPCSA). Demographic breakdowns include race/ethnicity, gender, and special populations (EL, FRL, IEP, foster, military, homeless, migrant).</p>
-<hr>
-</div>
-<div class="section level2">
-<h2 id="id_15-insights-from-nevada-enrollment-data">15 Insights from Nevada Enrollment Data<a class="anchor" aria-label="anchor" href="#id_15-insights-from-nevada-enrollment-data"></a>
-</h2>
-<div class="section level3">
-<h3 id="id_1-nevada-lost-nearly-13000-students-between-2021-and-2026">1. Nevada lost nearly 13,000 students between 2021 and 2026<a class="anchor" aria-label="anchor" href="#id_1-nevada-lost-nearly-13000-students-between-2021-and-2026"></a>
-</h3>
-<p>Nevada was one of America’s fastest-growing states for decades, but school enrollment has declined since 2022. The state shed 18,681 students from its 2022 peak to 2026.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://almartin82.github.io/nvschooldata">nvschooldata</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
@@ -78,170 +69,12 @@
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Note: 2025 data temporarily unavailable from NDE</span></span>
-<span><span class="va">enr</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/fetch_enr_multi.html">fetch_enr_multi</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2021</span><span class="op">:</span><span class="fl">2024</span>, <span class="fl">2026</span><span class="op">)</span>, use_cache <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">state_totals</span> <span class="op">&lt;-</span> <span class="va">enr</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"total_enrollment"</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">end_year</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span>n_students <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">n_students</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, .groups <span class="op">=</span> <span class="st">"drop"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>change <span class="op">=</span> <span class="va">n_students</span> <span class="op">-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/lead-lag.html" class="external-link">lag</a></span><span class="op">(</span><span class="va">n_students</span><span class="op">)</span>,</span>
-<span>         pct_change <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">change</span> <span class="op">/</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/lead-lag.html" class="external-link">lag</a></span><span class="op">(</span><span class="va">n_students</span><span class="op">)</span> <span class="op">*</span> <span class="fl">100</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">state_totals</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span></span>
-<span><span class="va">state_totals</span></span>
-<span><span class="co">#&gt; # A tibble: 5 x 4</span></span>
-<span><span class="co">#&gt;   end_year n_students change pct_change</span></span>
-<span><span class="co">#&gt;      &lt;dbl&gt;      &lt;dbl&gt;  &lt;dbl&gt;      &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1     2021     486633     NA      NA</span></span>
-<span><span class="co">#&gt; 2     2022     492338   5705       1.17</span></span>
-<span><span class="co">#&gt; 3     2023     489597  -2741      -0.56</span></span>
-<span><span class="co">#&gt; 4     2024     485570  -4027      -0.82</span></span>
-<span><span class="co">#&gt; 5     2026     473657 -11913      -2.45</span></span></code></pre></div>
-<div class="float">
-<img src="https://almartin82.github.io/nvschooldata/articles/enrollment_hooks_files/figure-html/statewide-chart-1.png" alt="Nevada statewide enrollment trends"><div class="figcaption">Nevada statewide enrollment trends</div>
-</div>
-<hr>
-</div>
+<span><span class="va">enr</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/fetch_enr_multi.html">fetch_enr_multi</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2021</span><span class="op">:</span><span class="fl">2024</span>, <span class="fl">2026</span><span class="op">)</span>, use_cache <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <div class="section level3">
-<h3 id="id_2-charter-schools-crack-the-top-10-in-nevada">2. Charter schools crack the top 10 in Nevada<a class="anchor" aria-label="anchor" href="#id_2-charter-schools-crack-the-top-10-in-nevada"></a>
-</h3>
-<p>Clark County dominates, but three charter networks (Somerset, Pinecrest, Doral) now enroll more students than most county school districts. Somerset Academy alone enrolls more than 14 of the 17 county districts.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">enr_2026</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/fetch_enr.html">fetch_enr</a></span><span class="op">(</span><span class="fl">2026</span>, use_cache <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">top_districts</span> <span class="op">&lt;-</span> <span class="va">enr_2026</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"total_enrollment"</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">desc</a></span><span class="op">(</span><span class="va">n_students</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">district_name</span>, <span class="va">n_students</span>, <span class="va">is_charter</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">top_districts</span><span class="op">)</span> <span class="op">==</span> <span class="fl">10</span><span class="op">)</span></span>
-<span><span class="va">top_districts</span></span>
-<span><span class="co">#&gt; # A tibble: 10 x 3</span></span>
-<span><span class="co">#&gt;    district_name                      n_students is_charter</span></span>
-<span><span class="co">#&gt;    &lt;chr&gt;                                   &lt;dbl&gt; &lt;lgl&gt;</span></span>
-<span><span class="co">#&gt;  1 Clark County School District           291587 FALSE</span></span>
-<span><span class="co">#&gt;  2 Washoe County School District           63655 FALSE</span></span>
-<span><span class="co">#&gt;  3 Somerset Academy of Las Vegas            9534 TRUE</span></span>
-<span><span class="co">#&gt;  4 Elko County School District              9293 FALSE</span></span>
-<span><span class="co">#&gt;  5 Lyon County School District              9060 FALSE</span></span>
-<span><span class="co">#&gt;  6 Pinecrest Academy of Nevada              8474 TRUE</span></span>
-<span><span class="co">#&gt;  7 Carson City School District              7281 FALSE</span></span>
-<span><span class="co">#&gt;  8 Doral Academy                            6442 TRUE</span></span>
-<span><span class="co">#&gt;  9 Nye County School District               5794 FALSE</span></span>
-<span><span class="co">#&gt; 10 Coral Academy of Science Las Vegas       5552 TRUE</span></span></code></pre></div>
-<div class="float">
-<img src="https://almartin82.github.io/nvschooldata/articles/enrollment_hooks_files/figure-html/top-districts-chart-1.png" alt="Top Nevada districts"><div class="figcaption">Top Nevada districts</div>
-</div>
-<hr>
-</div>
-<div class="section level3">
-<h3 id="id_3-hispanic-students-are-46-of-nevada-enrollment-down-slightly-from-47-in-2021">3. Hispanic students are 46% of Nevada enrollment, down slightly from 47% in 2021<a class="anchor" aria-label="anchor" href="#id_3-hispanic-students-are-46-of-nevada-enrollment-down-slightly-from-47-in-2021"></a>
-</h3>
-<p>Hispanic students are the largest demographic group in Nevada public schools at 45.9%, followed by white students at 25.9%. Hispanic share dipped from 46.8% in 2021 to 45.9% in 2026, a modest decrease even as Hispanic students remain the largest group.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">demographics</span> <span class="op">&lt;-</span> <span class="va">enr_2026</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span>,</span>
-<span>         <span class="va">subgroup</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"white"</span>, <span class="st">"black"</span>, <span class="st">"hispanic"</span>, <span class="st">"asian"</span>,</span>
-<span>                         <span class="st">"native_american"</span>, <span class="st">"multiracial"</span>, <span class="st">"pacific_islander"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">subgroup</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span>n_students <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">n_students</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, .groups <span class="op">=</span> <span class="st">"drop"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>pct <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">n_students</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">n_students</span><span class="op">)</span> <span class="op">*</span> <span class="fl">100</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">desc</a></span><span class="op">(</span><span class="va">n_students</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">demographics</span><span class="op">)</span> <span class="op">==</span> <span class="fl">7</span><span class="op">)</span></span>
-<span><span class="va">demographics</span></span>
-<span><span class="co">#&gt; # A tibble: 7 x 3</span></span>
-<span><span class="co">#&gt;   subgroup         n_students   pct</span></span>
-<span><span class="co">#&gt;   &lt;chr&gt;                 &lt;dbl&gt; &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1 hispanic             217320  45.9</span></span>
-<span><span class="co">#&gt; 2 white                122852  25.9</span></span>
-<span><span class="co">#&gt; 3 black                 58830  12.4</span></span>
-<span><span class="co">#&gt; 4 multiracial           37516   7.9</span></span>
-<span><span class="co">#&gt; 5 asian                 27170   5.7</span></span>
-<span><span class="co">#&gt; 6 pacific_islander       6622   1.4</span></span>
-<span><span class="co">#&gt; 7 native_american        3347   0.7</span></span></code></pre></div>
-<div class="float">
-<img src="https://almartin82.github.io/nvschooldata/articles/enrollment_hooks_files/figure-html/demographics-chart-1.png" alt="Nevada student demographics"><div class="figcaption">Nevada student demographics</div>
-</div>
-<hr>
-</div>
-<div class="section level3">
-<h3 id="id_4-las-vegas-metro-has-616-of-all-nevada-students">4. Las Vegas Metro has 61.6% of all Nevada students<a class="anchor" aria-label="anchor" href="#id_4-las-vegas-metro-has-616-of-all-nevada-students"></a>
-</h3>
-<p>Beyond Las Vegas and Reno, the remaining 68 entities (15 rural county districts plus charter schools) account for 25% of enrollment.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">regional</span> <span class="op">&lt;-</span> <span class="va">enr_2026</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"total_enrollment"</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>region <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"Clark"</span>, <span class="va">district_name</span><span class="op">)</span> <span class="op">~</span> <span class="st">"Las Vegas Metro"</span>,</span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"Washoe"</span>, <span class="va">district_name</span><span class="op">)</span> <span class="op">~</span> <span class="st">"Reno Metro"</span>,</span>
-<span>    <span class="cn">TRUE</span> <span class="op">~</span> <span class="st">"Rest of Nevada"</span></span>
-<span>  <span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span></span>
-<span>    n_entities <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/n_distinct.html" class="external-link">n_distinct</a></span><span class="op">(</span><span class="va">district_name</span><span class="op">)</span>,</span>
-<span>    total_enrollment <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">n_students</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
-<span>    .groups <span class="op">=</span> <span class="st">"drop"</span></span>
-<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>pct <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">total_enrollment</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">total_enrollment</span><span class="op">)</span> <span class="op">*</span> <span class="fl">100</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">regional</span><span class="op">)</span> <span class="op">==</span> <span class="fl">3</span><span class="op">)</span></span>
-<span><span class="va">regional</span></span>
-<span><span class="co">#&gt; # A tibble: 3 x 4</span></span>
-<span><span class="co">#&gt;   region          n_entities total_enrollment   pct</span></span>
-<span><span class="co">#&gt;   &lt;chr&gt;                &lt;int&gt;            &lt;dbl&gt; &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1 Las Vegas Metro          1           291587  61.6</span></span>
-<span><span class="co">#&gt; 2 Reno Metro               1            63655  13.4</span></span>
-<span><span class="co">#&gt; 3 Rest of Nevada          68           118415  25.0</span></span></code></pre></div>
-<div class="float">
-<img src="https://almartin82.github.io/nvschooldata/articles/enrollment_hooks_files/figure-html/regional-chart-1.png" alt="Enrollment by region"><div class="figcaption">Enrollment by region</div>
-</div>
-<hr>
-</div>
-<div class="section level3">
-<h3 id="id_5-clark-county-lost-27706-students-since-2021-while-washoe-held-steady">5. Clark County lost 27,706 students since 2021 while Washoe held steady<a class="anchor" aria-label="anchor" href="#id_5-clark-county-lost-27706-students-since-2021-while-washoe-held-steady"></a>
-</h3>
-<p>Clark County (Las Vegas) and Washoe County (Reno) are Nevada’s two urban anchors. Clark dropped 8.7% from 2021 to 2026 while Washoe only dropped 2.1%.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">growth_data</span> <span class="op">&lt;-</span> <span class="va">enr</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"total_enrollment"</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span>,</span>
-<span>         <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"Clark|Washoe"</span>, <span class="va">district_name</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>county <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"Clark"</span>, <span class="va">district_name</span><span class="op">)</span> <span class="op">~</span> <span class="st">"Clark County"</span>,</span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"Washoe"</span>, <span class="va">district_name</span><span class="op">)</span> <span class="op">~</span> <span class="st">"Washoe County"</span></span>
-<span>  <span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">county</span>, <span class="va">end_year</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span>n_students <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">n_students</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, .groups <span class="op">=</span> <span class="st">"drop"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">county</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>index <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">n_students</span> <span class="op">/</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/nth.html" class="external-link">first</a></span><span class="op">(</span><span class="va">n_students</span><span class="op">)</span> <span class="op">*</span> <span class="fl">100</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">growth_data</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span></span>
-<span><span class="va">growth_data</span></span>
-<span><span class="co">#&gt; # A tibble: 10 x 4</span></span>
-<span><span class="co">#&gt;    county        end_year n_students index</span></span>
-<span><span class="co">#&gt;    &lt;chr&gt;            &lt;dbl&gt;      &lt;dbl&gt; &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt;  1 Clark County      2021     319293 100</span></span>
-<span><span class="co">#&gt;  2 Clark County      2022     320245 100.3</span></span>
-<span><span class="co">#&gt;  3 Clark County      2023     314372  98.5</span></span>
-<span><span class="co">#&gt;  4 Clark County      2024     309397  96.9</span></span>
-<span><span class="co">#&gt;  5 Clark County      2026     291587  91.3</span></span>
-<span><span class="co">#&gt;  6 Washoe County     2021      64988 100</span></span>
-<span><span class="co">#&gt;  7 Washoe County     2022      66541 102.4</span></span>
-<span><span class="co">#&gt;  8 Washoe County     2023      64990 100</span></span>
-<span><span class="co">#&gt;  9 Washoe County     2024      64755  99.6</span></span>
-<span><span class="co">#&gt; 10 Washoe County     2026      63655  97.9</span></span></code></pre></div>
-<div class="float">
-<img src="https://almartin82.github.io/nvschooldata/articles/enrollment_hooks_files/figure-html/growth-chart-1.png" alt="Clark vs Washoe enrollment trends"><div class="figcaption">Clark vs Washoe enrollment trends</div>
-</div>
-<hr>
-</div>
-<div class="section level3">
-<h3 id="id_6-charter-enrollment-surged-33-while-traditional-districts-lost-30000-students">6. Charter enrollment surged 33% while traditional districts lost 30,000 students<a class="anchor" aria-label="anchor" href="#id_6-charter-enrollment-surged-33-while-traditional-districts-lost-30000-students"></a>
+<h3 id="id_1-charter-enrollment-surged-33-while-traditional-districts-lost-30000-students">1. Charter enrollment surged 33% while traditional districts lost 30,000 students<a class="anchor" aria-label="anchor" href="#id_1-charter-enrollment-surged-33-while-traditional-districts-lost-30000-students"></a>
 </h3>
 <p>The State Public Charter School Authority (SPCSA) oversees Nevada’s charter sector. Charters grew from 53,223 students in 2021 to 70,534 in 2026 – a 33% increase – while traditional districts lost 30,287 students in the same period.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">charter_trend</span> <span class="op">&lt;-</span> <span class="va">enr</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"total_enrollment"</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">end_year</span>, <span class="va">is_charter</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -267,131 +100,42 @@
 <div class="float">
 <img src="https://almartin82.github.io/nvschooldata/articles/enrollment_hooks_files/figure-html/charter-chart-1.png" alt="Charter vs traditional enrollment trends"><div class="figcaption">Charter vs traditional enrollment trends</div>
 </div>
+<p><a href="https://almartin82.github.io/nvschooldata/articles/enrollment_hooks.html#charter-enrollment-surged-33-while-traditional-districts-lost-30000-students">(source)</a></p>
 <hr>
 </div>
 <div class="section level3">
-<h3 id="id_7-washoe-county-lost-1333-students-over-5-years">7. Washoe County lost 1,333 students over 5 years<a class="anchor" aria-label="anchor" href="#id_7-washoe-county-lost-1333-students-over-5-years"></a>
+<h3 id="id_2-nevada-lost-nearly-13000-students-between-2021-and-2026">2. Nevada lost nearly 13,000 students between 2021 and 2026<a class="anchor" aria-label="anchor" href="#id_2-nevada-lost-nearly-13000-students-between-2021-and-2026"></a>
 </h3>
-<p>Washoe County (Reno-Sparks) is Nevada’s second-largest district. It peaked at 66,541 in 2022 before declining.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">washoe_data</span> <span class="op">&lt;-</span> <span class="va">enr</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"total_enrollment"</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span>,</span>
-<span>         <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"Washoe"</span>, <span class="va">district_name</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<p>Nevada was one of America’s fastest-growing states for decades, but school enrollment has declined since 2022. The state shed 18,681 students from its 2022 peak to 2026.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">state_totals</span> <span class="op">&lt;-</span> <span class="va">enr</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"total_enrollment"</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">end_year</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span>n_students <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">n_students</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, .groups <span class="op">=</span> <span class="st">"drop"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>change <span class="op">=</span> <span class="va">n_students</span> <span class="op">-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/lead-lag.html" class="external-link">lag</a></span><span class="op">(</span><span class="va">n_students</span><span class="op">)</span>,</span>
 <span>         pct_change <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">change</span> <span class="op">/</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/lead-lag.html" class="external-link">lag</a></span><span class="op">(</span><span class="va">n_students</span><span class="op">)</span> <span class="op">*</span> <span class="fl">100</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">washoe_data</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span></span>
-<span><span class="va">washoe_data</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">state_totals</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span></span>
+<span><span class="va">state_totals</span></span>
 <span><span class="co">#&gt; # A tibble: 5 x 4</span></span>
 <span><span class="co">#&gt;   end_year n_students change pct_change</span></span>
 <span><span class="co">#&gt;      &lt;dbl&gt;      &lt;dbl&gt;  &lt;dbl&gt;      &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1     2021      64988     NA      NA</span></span>
-<span><span class="co">#&gt; 2     2022      66541   1553       2.39</span></span>
-<span><span class="co">#&gt; 3     2023      64990  -1551      -2.33</span></span>
-<span><span class="co">#&gt; 4     2024      64755   -235      -0.36</span></span>
-<span><span class="co">#&gt; 5     2026      63655  -1100      -1.70</span></span></code></pre></div>
+<span><span class="co">#&gt; 1     2021     486633     NA      NA</span></span>
+<span><span class="co">#&gt; 2     2022     492338   5705       1.17</span></span>
+<span><span class="co">#&gt; 3     2023     489597  -2741      -0.56</span></span>
+<span><span class="co">#&gt; 4     2024     485570  -4027      -0.82</span></span>
+<span><span class="co">#&gt; 5     2026     473657 -11913      -2.45</span></span></code></pre></div>
 <div class="float">
-<img src="https://almartin82.github.io/nvschooldata/articles/enrollment_hooks_files/figure-html/washoe-chart-1.png" alt="Washoe County enrollment"><div class="figcaption">Washoe County enrollment</div>
+<img src="https://almartin82.github.io/nvschooldata/articles/enrollment_hooks_files/figure-html/statewide-chart-1.png" alt="Nevada statewide enrollment trends"><div class="figcaption">Nevada statewide enrollment trends</div>
 </div>
+<p><a href="https://almartin82.github.io/nvschooldata/articles/enrollment_hooks.html#nevada-lost-nearly-13000-students-between-2021-and-2026">(source)</a></p>
 <hr>
 </div>
 <div class="section level3">
-<h3 id="id_8-12th-grade-has-the-most-students-pk-has-the-fewest">8. 12th grade has the most students; PK has the fewest<a class="anchor" aria-label="anchor" href="#id_8-12th-grade-has-the-most-students-pk-has-the-fewest"></a>
-</h3>
-<p>Tracking enrollment by grade reveals a classic pattern: PK is small (13,852), enrollment jumps at K (30,490), and peaks at 12th grade (37,730). Grade-level data is available at the school level.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">grade_data</span> <span class="op">&lt;-</span> <span class="va">enr_2026</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_school</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"total_enrollment"</span>,</span>
-<span>         <span class="op">!</span><span class="va">grade_level</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"TOTAL"</span>, <span class="st">"UG"</span>, <span class="st">"AD"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">grade_level</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span>n_students <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">n_students</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, .groups <span class="op">=</span> <span class="st">"drop"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>grade_level <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">grade_level</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"PK"</span>, <span class="st">"K"</span>, <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"%02d"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">12</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">grade_level</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">grade_data</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span></span>
-<span><span class="va">grade_data</span></span>
-<span><span class="co">#&gt; # A tibble: 14 x 2</span></span>
-<span><span class="co">#&gt;    grade_level n_students</span></span>
-<span><span class="co">#&gt;    &lt;fct&gt;            &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt;  1 PK               13852</span></span>
-<span><span class="co">#&gt;  2 K                30490</span></span>
-<span><span class="co">#&gt;  3 01               31486</span></span>
-<span><span class="co">#&gt;  4 02               30265</span></span>
-<span><span class="co">#&gt;  5 03               33417</span></span>
-<span><span class="co">#&gt;  6 04               35890</span></span>
-<span><span class="co">#&gt;  7 05               34847</span></span>
-<span><span class="co">#&gt;  8 06               35814</span></span>
-<span><span class="co">#&gt;  9 07               36276</span></span>
-<span><span class="co">#&gt; 10 08               36577</span></span>
-<span><span class="co">#&gt; 11 09               37251</span></span>
-<span><span class="co">#&gt; 12 10               37010</span></span>
-<span><span class="co">#&gt; 13 11               37217</span></span>
-<span><span class="co">#&gt; 14 12               37730</span></span></code></pre></div>
-<div class="float">
-<img src="https://almartin82.github.io/nvschooldata/articles/enrollment_hooks_files/figure-html/grade-chart-1.png" alt="Enrollment by grade level"><div class="figcaption">Enrollment by grade level</div>
-</div>
-<hr>
-</div>
-<div class="section level3">
-<h3 id="id_9-boys-outnumber-girls-513-to-487-statewide">9. Boys outnumber girls 51.3% to 48.7% statewide<a class="anchor" aria-label="anchor" href="#id_9-boys-outnumber-girls-513-to-487-statewide"></a>
-</h3>
-<p>The gender split across Nevada schools is close to even, with a slight male skew consistent with national patterns.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">gender_data</span> <span class="op">&lt;-</span> <span class="va">enr_2026</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span>,</span>
-<span>         <span class="va">subgroup</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"male"</span>, <span class="st">"female"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">subgroup</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span>n_students <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">n_students</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, .groups <span class="op">=</span> <span class="st">"drop"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>pct <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">n_students</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">n_students</span><span class="op">)</span> <span class="op">*</span> <span class="fl">100</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">gender_data</span><span class="op">)</span> <span class="op">==</span> <span class="fl">2</span><span class="op">)</span></span>
-<span><span class="va">gender_data</span></span>
-<span><span class="co">#&gt; # A tibble: 2 x 3</span></span>
-<span><span class="co">#&gt;   subgroup n_students   pct</span></span>
-<span><span class="co">#&gt;   &lt;chr&gt;         &lt;dbl&gt; &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1 female       230511  48.7</span></span>
-<span><span class="co">#&gt; 2 male         243022  51.3</span></span></code></pre></div>
-<div class="float">
-<img src="https://almartin82.github.io/nvschooldata/articles/enrollment_hooks_files/figure-html/gender-chart-1.png" alt="Enrollment by gender"><div class="figcaption">Enrollment by gender</div>
-</div>
-<hr>
-</div>
-<div class="section level3">
-<h3 id="id_10-clark-county-has-5x-more-el-students-than-washoe-but-similar-frl-rates">10. Clark County has 5x more EL students than Washoe but similar FRL rates<a class="anchor" aria-label="anchor" href="#id_10-clark-county-has-5x-more-el-students-than-washoe-but-similar-frl-rates"></a>
-</h3>
-<p>English Learners, students with IEPs, and Free/Reduced Lunch eligible students represent key populations for educational policy. Clark County has ~46,000 EL students vs Washoe’s ~9,200.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">special_pops</span> <span class="op">&lt;-</span> <span class="va">enr_2026</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span>,</span>
-<span>         <span class="va">subgroup</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"free_reduced_lunch"</span>, <span class="st">"special_ed"</span>, <span class="st">"lep"</span><span class="op">)</span>,</span>
-<span>         <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"Clark|Washoe"</span>, <span class="va">district_name</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>county <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"Clark"</span>, <span class="va">district_name</span><span class="op">)</span>, <span class="st">"Clark County"</span>, <span class="st">"Washoe County"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">county</span>, <span class="va">subgroup</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span>n_students <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">n_students</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, .groups <span class="op">=</span> <span class="st">"drop"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">special_pops</span><span class="op">)</span> <span class="op">==</span> <span class="fl">6</span><span class="op">)</span></span>
-<span><span class="va">special_pops</span></span>
-<span><span class="co">#&gt; # A tibble: 6 x 3</span></span>
-<span><span class="co">#&gt;   county        subgroup           n_students</span></span>
-<span><span class="co">#&gt;   &lt;chr&gt;         &lt;chr&gt;                   &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt; 1 Clark County  free_reduced_lunch     282969</span></span>
-<span><span class="co">#&gt; 2 Clark County  lep                     45993</span></span>
-<span><span class="co">#&gt; 3 Clark County  special_ed              44484</span></span>
-<span><span class="co">#&gt; 4 Washoe County free_reduced_lunch      39010</span></span>
-<span><span class="co">#&gt; 5 Washoe County lep                      9229</span></span>
-<span><span class="co">#&gt; 6 Washoe County special_ed              10537</span></span></code></pre></div>
-<div class="float">
-<img src="https://almartin82.github.io/nvschooldata/articles/enrollment_hooks_files/figure-html/special-pops-chart-1.png" alt="Special populations by district"><div class="figcaption">Special populations by district</div>
-</div>
-<hr>
-</div>
-<div class="section level3">
-<h3 id="id_11-kindergarten-enrollment-swung-wildly-up-8-in-2022-down-9-in-2024">11. Kindergarten enrollment swung wildly: up 8% in 2022, down 9% in 2024<a class="anchor" aria-label="anchor" href="#id_11-kindergarten-enrollment-swung-wildly-up-8-in-2022-down-9-in-2024"></a>
+<h3 id="id_3-kindergarten-enrollment-swung-wildly-up-8-in-2022-down-9-in-2024">3. Kindergarten enrollment swung wildly: up 8% in 2022, down 9% in 2024<a class="anchor" aria-label="anchor" href="#id_3-kindergarten-enrollment-swung-wildly-up-8-in-2022-down-9-in-2024"></a>
 </h3>
 <p>Kindergarten enrollment is a leading indicator of future trends. Nevada K enrollment hit 34,641 in 2022 then crashed to 28,931 in 2024 before recovering to 30,490 in 2026. Grade-level data is available at the school level.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">k_data</span> <span class="op">&lt;-</span> <span class="va">enr</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_school</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"total_enrollment"</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"K"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">end_year</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -412,155 +156,100 @@
 <div class="float">
 <img src="https://almartin82.github.io/nvschooldata/articles/enrollment_hooks_files/figure-html/kindergarten-chart-1.png" alt="Kindergarten enrollment trends"><div class="figcaption">Kindergarten enrollment trends</div>
 </div>
-<hr>
-</div>
-<div class="section level3">
-<h3 id="id_12-futuro-academy-has-the-highest-el-concentration-at-41">12. Futuro Academy has the highest EL concentration at 41%<a class="anchor" aria-label="anchor" href="#id_12-futuro-academy-has-the-highest-el-concentration-at-41"></a>
-</h3>
-<p>English Learner populations vary dramatically. Clark County leads in absolute numbers (45,993), but several charter schools have much higher EL concentrations. Futuro Academy leads at 41.1% EL students, followed by Equipo Academy at 38.5%.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">el_data</span> <span class="op">&lt;-</span> <span class="va">enr_2026</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"lep"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">desc</a></span><span class="op">(</span><span class="va">n_students</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">district_name</span>, <span class="va">n_students</span>, <span class="va">pct</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">el_data</span><span class="op">)</span> <span class="op">==</span> <span class="fl">10</span><span class="op">)</span></span>
-<span><span class="va">el_data</span></span>
-<span><span class="co">#&gt; # A tibble: 10 x 3</span></span>
-<span><span class="co">#&gt;    district_name                      n_students    pct</span></span>
-<span><span class="co">#&gt;    &lt;chr&gt;                                   &lt;dbl&gt;  &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt;  1 Clark County School District            45993 0.158</span></span>
-<span><span class="co">#&gt;  2 Washoe County School District            9229 0.145</span></span>
-<span><span class="co">#&gt;  3 Mater Academy of Nevada                  1816 0.343</span></span>
-<span><span class="co">#&gt;  4 Carson City School District               916 0.126</span></span>
-<span><span class="co">#&gt;  5 Elko County School District               774 0.083</span></span>
-<span><span class="co">#&gt;  6 Lyon County School District               637 0.070</span></span>
-<span><span class="co">#&gt;  7 Nye County School District                449 0.077</span></span>
-<span><span class="co">#&gt;  8 Somerset Academy of Las Vegas             405 0.042</span></span>
-<span><span class="co">#&gt;  9 CIVICA Academy                            403 0.280</span></span>
-<span><span class="co">#&gt; 10 Equipo Academy                            365 0.385</span></span></code></pre></div>
-<div class="float">
-<img src="https://almartin82.github.io/nvschooldata/articles/enrollment_hooks_files/figure-html/el-chart-1.png" alt="English Learner enrollment by district"><div class="figcaption">English Learner enrollment by district</div>
-</div>
-<hr>
-</div>
-<div class="section level3">
-<h3 id="id_13-fifteen-districts-report-100-frl-eligibility">13. Fifteen districts report 100% FRL eligibility<a class="anchor" aria-label="anchor" href="#id_13-fifteen-districts-report-100-frl-eligibility"></a>
-</h3>
-<p>FRL eligibility is a proxy for economic disadvantage. Many charter schools report 100% FRL, along with two rural counties (Esmeralda and Pershing). The variation across districts is enormous.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">frl_data</span> <span class="op">&lt;-</span> <span class="va">enr_2026</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"free_reduced_lunch"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>pct_display <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">pct</span> <span class="op">*</span> <span class="fl">100</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">desc</a></span><span class="op">(</span><span class="va">pct</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">15</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">district_name</span>, <span class="va">n_students</span>, <span class="va">pct_display</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">frl_data</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span></span>
-<span><span class="va">frl_data</span></span>
-<span><span class="co">#&gt; # A tibble: 15 x 3</span></span>
-<span><span class="co">#&gt;    district_name                           n_students pct_display</span></span>
-<span><span class="co">#&gt;    &lt;chr&gt;                                        &lt;dbl&gt;       &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt;  1 Esmeralda County School District                69       100</span></span>
-<span><span class="co">#&gt;  2 Pershing County School District                647       100</span></span>
-<span><span class="co">#&gt;  3 Futuro Academy                                 484       100</span></span>
-<span><span class="co">#&gt;  4 Mater Academy of Northern Nevada               514       100</span></span>
-<span><span class="co">#&gt;  5 Democracy Prep                                 927       100</span></span>
-<span><span class="co">#&gt;  6 Sports Leadership and Management Academy      1988       100</span></span>
-<span><span class="co">#&gt;  7 Equipo Academy                                 949       100</span></span>
-<span><span class="co">#&gt;  8 Mater Academy of Nevada                       5297       100</span></span>
-<span><span class="co">#&gt;  9 Rainbow Dreams Early Learning Academy          229       100</span></span>
-<span><span class="co">#&gt; 10 The Delta Academy                             1315       100</span></span>
-<span><span class="co">#&gt; 11 Innovations International Charter School       619       100</span></span>
-<span><span class="co">#&gt; 12 Quest Academy                                  415       100</span></span>
-<span><span class="co">#&gt; 13 FuturEdge Academy                              318       100</span></span>
-<span><span class="co">#&gt; 14 Southern Nevada Trades High School             250       100</span></span>
-<span><span class="co">#&gt; 15 Vegas Vista Academy                            270       100</span></span></code></pre></div>
-<div class="float">
-<img src="https://almartin82.github.io/nvschooldata/articles/enrollment_hooks_files/figure-html/frl-chart-1.png" alt="FRL eligibility by district"><div class="figcaption">FRL eligibility by district</div>
-</div>
-<hr>
-</div>
-<div class="section level3">
-<h3 id="id_14-nevadas-smallest-leas-are-charter-schools-not-counties">14. Nevada’s smallest LEAs are charter schools, not counties<a class="anchor" aria-label="anchor" href="#id_14-nevadas-smallest-leas-are-charter-schools-not-counties"></a>
-</h3>
-<p>While Esmeralda County (69 students) is the smallest county district, Nevada’s smallest LEAs are micro-charters. Nevada State High School II has just 18 students.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">smallest</span> <span class="op">&lt;-</span> <span class="va">enr_2026</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"total_enrollment"</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">n_students</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">district_name</span>, <span class="va">n_students</span>, <span class="va">is_charter</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">smallest</span><span class="op">)</span> <span class="op">==</span> <span class="fl">10</span><span class="op">)</span></span>
-<span><span class="va">smallest</span></span>
-<span><span class="co">#&gt; # A tibble: 10 x 3</span></span>
-<span><span class="co">#&gt;    district_name                                  n_students is_charter</span></span>
-<span><span class="co">#&gt;    &lt;chr&gt;                                               &lt;dbl&gt; &lt;lgl&gt;</span></span>
-<span><span class="co">#&gt;  1 Nevada State High School II                            18 TRUE</span></span>
-<span><span class="co">#&gt;  2 Independence High School                               37 FALSE</span></span>
-<span><span class="co">#&gt;  3 Esmeralda County School District                       69 FALSE</span></span>
-<span><span class="co">#&gt;  4 Nevada Classical Academy Elko                          83 TRUE</span></span>
-<span><span class="co">#&gt;  5 Young Women's Leadership Academy of Las Vegas         108 TRUE</span></span>
-<span><span class="co">#&gt;  6 Learning Bridge                                       171 TRUE</span></span>
-<span><span class="co">#&gt;  7 Davidson Academy                                      171 FALSE</span></span>
-<span><span class="co">#&gt;  8 Do &amp; Be Arts Academy of Excellence                    175 TRUE</span></span>
-<span><span class="co">#&gt;  9 Silver Sands Montessori                               188 TRUE</span></span>
-<span><span class="co">#&gt; 10 Honors Academy of Literature                          202 TRUE</span></span></code></pre></div>
-<div class="float">
-<img src="https://almartin82.github.io/nvschooldata/articles/enrollment_hooks_files/figure-html/smallest-chart-1.png" alt="Nevada’s smallest districts"><div class="figcaption">Nevada’s smallest districts</div>
-</div>
-<hr>
-</div>
-<div class="section level3">
-<h3 id="id_15-lyon-county-has-the-highest-iep-rate-among-large-districts-at-17">15. Lyon County has the highest IEP rate among large districts at 17%<a class="anchor" aria-label="anchor" href="#id_15-lyon-county-has-the-highest-iep-rate-among-large-districts-at-17"></a>
-</h3>
-<p>Students with IEPs require specialized services. Clark County has the most IEP students by count (44,484), but Lyon County has the highest rate among sizable districts at 17%.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">iep_data</span> <span class="op">&lt;-</span> <span class="va">enr_2026</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"special_ed"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>pct_display <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">pct</span> <span class="op">*</span> <span class="fl">100</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">desc</a></span><span class="op">(</span><span class="va">n_students</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">district_name</span>, <span class="va">n_students</span>, <span class="va">pct_display</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">iep_data</span><span class="op">)</span> <span class="op">==</span> <span class="fl">10</span><span class="op">)</span></span>
-<span><span class="va">iep_data</span></span>
-<span><span class="co">#&gt; # A tibble: 10 x 3</span></span>
-<span><span class="co">#&gt;    district_name                  n_students pct_display</span></span>
-<span><span class="co">#&gt;    &lt;chr&gt;                               &lt;dbl&gt;       &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt;  1 Clark County School District        44484        15.3</span></span>
-<span><span class="co">#&gt;  2 Washoe County School District       10537        16.6</span></span>
-<span><span class="co">#&gt;  3 Lyon County School District          1541        17.0</span></span>
-<span><span class="co">#&gt;  4 Somerset Academy of Las Vegas        1258        13.2</span></span>
-<span><span class="co">#&gt;  5 Elko County School District          1238        13.3</span></span>
-<span><span class="co">#&gt;  6 Carson City School District           943        13.0</span></span>
-<span><span class="co">#&gt;  7 Nye County School District            882        15.2</span></span>
-<span><span class="co">#&gt;  8 Pinecrest Academy of Nevada           840         9.9</span></span>
-<span><span class="co">#&gt;  9 Douglas County School District        692        14.6</span></span>
-<span><span class="co">#&gt; 10 Doral Academy                         674        10.5</span></span></code></pre></div>
-<div class="float">
-<img src="https://almartin82.github.io/nvschooldata/articles/enrollment_hooks_files/figure-html/iep-chart-1.png" alt="IEP students by district"><div class="figcaption">IEP students by district</div>
-</div>
+<p><a href="https://almartin82.github.io/nvschooldata/articles/enrollment_hooks.html#kindergarten-enrollment-swung-wildly-up-8-in-2022-down-9-in-2024">(source)</a></p>
 <hr>
 </div>
 </div>
 <div class="section level2">
-<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+<h2 id="data-taxonomy">Data Taxonomy<a class="anchor" aria-label="anchor" href="#data-taxonomy"></a>
 </h2>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
-<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"almartin82/nvschooldata"</span><span class="op">)</span></span></code></pre></div>
+<table class="table">
+<colgroup>
+<col width="27%">
+<col width="19%">
+<col width="27%">
+<col width="25%">
+</colgroup>
+<thead><tr class="header">
+<th>Category</th>
+<th>Years</th>
+<th>Function</th>
+<th>Details</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><strong>Enrollment</strong></td>
+<td>2016-2026</td>
+<td>
+<code><a href="reference/fetch_enr.html">fetch_enr()</a></code> / <code><a href="reference/fetch_enr_multi.html">fetch_enr_multi()</a></code>
+</td>
+<td>District, school. Race, gender, FRL, SpEd, LEP</td>
+</tr>
+<tr class="even">
+<td>Assessments</td>
+<td>—</td>
+<td>—</td>
+<td>Not yet available</td>
+</tr>
+<tr class="odd">
+<td>Graduation</td>
+<td>—</td>
+<td>—</td>
+<td>Not yet available</td>
+</tr>
+<tr class="even">
+<td><strong>Directory</strong></td>
+<td>Current</td>
+<td><code><a href="reference/fetch_directory.html">fetch_directory()</a></code></td>
+<td>School-level. Contact info, charter status, locale</td>
+</tr>
+<tr class="odd">
+<td>Per-Pupil Spending</td>
+<td>—</td>
+<td>—</td>
+<td>Not yet available</td>
+</tr>
+<tr class="even">
+<td>Accountability</td>
+<td>—</td>
+<td>—</td>
+<td>Not yet available</td>
+</tr>
+<tr class="odd">
+<td>Chronic Absence</td>
+<td>—</td>
+<td>—</td>
+<td>Not yet available</td>
+</tr>
+<tr class="even">
+<td>EL Progress</td>
+<td>—</td>
+<td>—</td>
+<td>Not yet available</td>
+</tr>
+<tr class="odd">
+<td>Special Ed</td>
+<td>—</td>
+<td>—</td>
+<td>Not yet available</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>See the full <a href="DATA-CATEGORY-TAXONOMY.html">data category taxonomy</a></p>
+</blockquote>
 </div>
 <div class="section level2">
-<h2 id="quick-start">Quick start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
+<h2 id="quick-start">Quick Start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
 </h2>
 <div class="section level3">
 <h3 id="r">R<a class="anchor" aria-label="anchor" href="#r"></a>
 </h3>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://almartin82.github.io/nvschooldata">nvschooldata</a></span><span class="op">)</span></span>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"almartin82/nvschooldata"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://almartin82.github.io/nvschooldata">nvschooldata</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Fetch one year</span></span>
@@ -583,32 +272,40 @@
 <span><span class="co"># District breakdown</span></span>
 <span><span class="va">enr_2026</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"total_enrollment"</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">desc</a></span><span class="op">(</span><span class="va">n_students</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">desc</a></span><span class="op">(</span><span class="va">n_students</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># School directory</span></span>
+<span><span class="va">dir_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/fetch_directory.html">fetch_directory</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="python">Python<a class="anchor" aria-label="anchor" href="#python"></a>
 </h3>
-<div class="sourceCode" id="cb18"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a><span class="im">import</span> pynvschooldata <span class="im">as</span> nv</span>
-<span id="cb18-2"><a href="#cb18-2" tabindex="-1"></a></span>
-<span id="cb18-3"><a href="#cb18-3" tabindex="-1"></a><span class="co"># Check available years</span></span>
-<span id="cb18-4"><a href="#cb18-4" tabindex="-1"></a>years <span class="op">=</span> nv.get_available_years()</span>
-<span id="cb18-5"><a href="#cb18-5" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Data available from </span><span class="sc">{</span>years[<span class="st">'min_year'</span>]<span class="sc">}</span><span class="ss"> to </span><span class="sc">{</span>years[<span class="st">'max_year'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb18-6"><a href="#cb18-6" tabindex="-1"></a></span>
-<span id="cb18-7"><a href="#cb18-7" tabindex="-1"></a><span class="co"># Fetch one year</span></span>
-<span id="cb18-8"><a href="#cb18-8" tabindex="-1"></a>df <span class="op">=</span> nv.fetch_enr(<span class="dv">2026</span>)</span>
-<span id="cb18-9"><a href="#cb18-9" tabindex="-1"></a></span>
-<span id="cb18-10"><a href="#cb18-10" tabindex="-1"></a><span class="co"># Fetch multiple years</span></span>
-<span id="cb18-11"><a href="#cb18-11" tabindex="-1"></a>df_multi <span class="op">=</span> nv.fetch_enr_multi([<span class="dv">2024</span>, <span class="dv">2026</span>])</span>
-<span id="cb18-12"><a href="#cb18-12" tabindex="-1"></a></span>
-<span id="cb18-13"><a href="#cb18-13" tabindex="-1"></a><span class="co"># Filter to district totals</span></span>
-<span id="cb18-14"><a href="#cb18-14" tabindex="-1"></a>district_totals <span class="op">=</span> df[</span>
-<span id="cb18-15"><a href="#cb18-15" tabindex="-1"></a>    (df[<span class="st">'is_district'</span>] <span class="op">==</span> <span class="va">True</span>) <span class="op">&amp;</span></span>
-<span id="cb18-16"><a href="#cb18-16" tabindex="-1"></a>    (df[<span class="st">'grade_level'</span>] <span class="op">==</span> <span class="st">'TOTAL'</span>) <span class="op">&amp;</span></span>
-<span id="cb18-17"><a href="#cb18-17" tabindex="-1"></a>    (df[<span class="st">'subgroup'</span>] <span class="op">==</span> <span class="st">'total_enrollment'</span>)</span>
-<span id="cb18-18"><a href="#cb18-18" tabindex="-1"></a>].sort_values(<span class="st">'n_students'</span>, ascending<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb18-19"><a href="#cb18-19" tabindex="-1"></a></span>
-<span id="cb18-20"><a href="#cb18-20" tabindex="-1"></a><span class="bu">print</span>(district_totals[[<span class="st">'district_name'</span>, <span class="st">'n_students'</span>]])</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="im">import</span> pynvschooldata <span class="im">as</span> nv</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="co"># Check available years</span></span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>years <span class="op">=</span> nv.get_available_years()</span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Data available from </span><span class="sc">{</span>years[<span class="st">'min_year'</span>]<span class="sc">}</span><span class="ss"> to </span><span class="sc">{</span>years[<span class="st">'max_year'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a><span class="co"># Fetch one year</span></span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>df <span class="op">=</span> nv.fetch_enr(<span class="dv">2026</span>)</span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a></span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a><span class="co"># Fetch multiple years</span></span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a>df_multi <span class="op">=</span> nv.fetch_enr_multi([<span class="dv">2024</span>, <span class="dv">2026</span>])</span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a></span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a><span class="co"># Filter to district totals</span></span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a>district_totals <span class="op">=</span> df[</span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a>    (df[<span class="st">'is_district'</span>] <span class="op">==</span> <span class="va">True</span>) <span class="op">&amp;</span></span>
+<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a>    (df[<span class="st">'grade_level'</span>] <span class="op">==</span> <span class="st">'TOTAL'</span>) <span class="op">&amp;</span></span>
+<span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a>    (df[<span class="st">'subgroup'</span>] <span class="op">==</span> <span class="st">'total_enrollment'</span>)</span>
+<span id="cb6-18"><a href="#cb6-18" tabindex="-1"></a>].sort_values(<span class="st">'n_students'</span>, ascending<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb6-19"><a href="#cb6-19" tabindex="-1"></a></span>
+<span id="cb6-20"><a href="#cb6-20" tabindex="-1"></a><span class="bu">print</span>(district_totals[[<span class="st">'district_name'</span>, <span class="st">'n_students'</span>]])</span></code></pre></div>
 </div>
+</div>
+<div class="section level2">
+<h2 id="explore-more">Explore More<a class="anchor" aria-label="anchor" href="#explore-more"></a>
+</h2>
+<p>Full analysis with 15 stories: - <a href="https://almartin82.github.io/nvschooldata/articles/enrollment_hooks.html">Enrollment trends</a> – 15 stories - <a href="https://almartin82.github.io/nvschooldata/reference/">Function reference</a></p>
 </div>
 <div class="section level2">
 <h2 id="data-notes">Data Notes<a class="anchor" aria-label="anchor" href="#data-notes"></a>
@@ -719,21 +416,403 @@
 </div>
 </div>
 <div class="section level2">
-<h2 id="part-of-the-state-schooldata-project">Part of the State Schooldata Project<a class="anchor" aria-label="anchor" href="#part-of-the-state-schooldata-project"></a>
+<h2 id="deeper-dive">Deeper Dive<a class="anchor" aria-label="anchor" href="#deeper-dive"></a>
 </h2>
-<p>A simple, consistent interface for accessing state-published school data in Python and R.</p>
-<p><strong>Mothership package:</strong> <a href="https://github.com/almartin82/njschooldata" class="external-link">njschooldata</a> (the original)</p>
-<p><strong>All 50 state packages:</strong> <a href="https://github.com/almartin82?tab=repositories&amp;q=schooldata" class="external-link">github.com/almartin82</a></p>
+<div class="section level3">
+<h3 id="id_4-charter-schools-crack-the-top-10-in-nevada">4. Charter schools crack the top 10 in Nevada<a class="anchor" aria-label="anchor" href="#id_4-charter-schools-crack-the-top-10-in-nevada"></a>
+</h3>
+<p>Clark County dominates, but three charter networks (Somerset, Pinecrest, Doral) now enroll more students than most county school districts. Somerset Academy alone enrolls more than 14 of the 17 county districts.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">enr_2026</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/fetch_enr.html">fetch_enr</a></span><span class="op">(</span><span class="fl">2026</span>, use_cache <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">top_districts</span> <span class="op">&lt;-</span> <span class="va">enr_2026</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"total_enrollment"</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">desc</a></span><span class="op">(</span><span class="va">n_students</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">district_name</span>, <span class="va">n_students</span>, <span class="va">is_charter</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">top_districts</span><span class="op">)</span> <span class="op">==</span> <span class="fl">10</span><span class="op">)</span></span>
+<span><span class="va">top_districts</span></span>
+<span><span class="co">#&gt; # A tibble: 10 x 3</span></span>
+<span><span class="co">#&gt;    district_name                      n_students is_charter</span></span>
+<span><span class="co">#&gt;    &lt;chr&gt;                                   &lt;dbl&gt; &lt;lgl&gt;</span></span>
+<span><span class="co">#&gt;  1 Clark County School District           291587 FALSE</span></span>
+<span><span class="co">#&gt;  2 Washoe County School District           63655 FALSE</span></span>
+<span><span class="co">#&gt;  3 Somerset Academy of Las Vegas            9534 TRUE</span></span>
+<span><span class="co">#&gt;  4 Elko County School District              9293 FALSE</span></span>
+<span><span class="co">#&gt;  5 Lyon County School District              9060 FALSE</span></span>
+<span><span class="co">#&gt;  6 Pinecrest Academy of Nevada              8474 TRUE</span></span>
+<span><span class="co">#&gt;  7 Carson City School District              7281 FALSE</span></span>
+<span><span class="co">#&gt;  8 Doral Academy                            6442 TRUE</span></span>
+<span><span class="co">#&gt;  9 Nye County School District               5794 FALSE</span></span>
+<span><span class="co">#&gt; 10 Coral Academy of Science Las Vegas       5552 TRUE</span></span></code></pre></div>
+<div class="float">
+<img src="https://almartin82.github.io/nvschooldata/articles/enrollment_hooks_files/figure-html/top-districts-chart-1.png" alt="Top Nevada districts"><div class="figcaption">Top Nevada districts</div>
 </div>
-<div class="section level2">
-<h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a>
-</h2>
-<p><a href="https://github.com/almartin82" class="external-link">Andy Martin</a> (<a href="mailto:almartin@gmail.com" class="email">almartin@gmail.com</a>)</p>
+<p><a href="https://almartin82.github.io/nvschooldata/articles/enrollment_hooks.html#charter-schools-crack-the-top-10-in-nevada">(source)</a></p>
+<hr>
 </div>
-<div class="section level2">
-<h2 id="license">License<a class="anchor" aria-label="anchor" href="#license"></a>
-</h2>
-<p>MIT</p>
+<div class="section level3">
+<h3 id="id_5-clark-county-lost-27706-students-since-2021-while-washoe-held-steady">5. Clark County lost 27,706 students since 2021 while Washoe held steady<a class="anchor" aria-label="anchor" href="#id_5-clark-county-lost-27706-students-since-2021-while-washoe-held-steady"></a>
+</h3>
+<p>Clark County (Las Vegas) and Washoe County (Reno) are Nevada’s two urban anchors. Clark dropped 8.7% from 2021 to 2026 while Washoe only dropped 2.1%.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">growth_data</span> <span class="op">&lt;-</span> <span class="va">enr</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"total_enrollment"</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span>,</span>
+<span>         <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"Clark|Washoe"</span>, <span class="va">district_name</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>county <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"Clark"</span>, <span class="va">district_name</span><span class="op">)</span> <span class="op">~</span> <span class="st">"Clark County"</span>,</span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"Washoe"</span>, <span class="va">district_name</span><span class="op">)</span> <span class="op">~</span> <span class="st">"Washoe County"</span></span>
+<span>  <span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">county</span>, <span class="va">end_year</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span>n_students <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">n_students</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, .groups <span class="op">=</span> <span class="st">"drop"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">county</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>index <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">n_students</span> <span class="op">/</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/nth.html" class="external-link">first</a></span><span class="op">(</span><span class="va">n_students</span><span class="op">)</span> <span class="op">*</span> <span class="fl">100</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">growth_data</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span></span>
+<span><span class="va">growth_data</span></span>
+<span><span class="co">#&gt; # A tibble: 10 x 4</span></span>
+<span><span class="co">#&gt;    county        end_year n_students index</span></span>
+<span><span class="co">#&gt;    &lt;chr&gt;            &lt;dbl&gt;      &lt;dbl&gt; &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt;  1 Clark County      2021     319293 100</span></span>
+<span><span class="co">#&gt;  2 Clark County      2022     320245 100.3</span></span>
+<span><span class="co">#&gt;  3 Clark County      2023     314372  98.5</span></span>
+<span><span class="co">#&gt;  4 Clark County      2024     309397  96.9</span></span>
+<span><span class="co">#&gt;  5 Clark County      2026     291587  91.3</span></span>
+<span><span class="co">#&gt;  6 Washoe County     2021      64988 100</span></span>
+<span><span class="co">#&gt;  7 Washoe County     2022      66541 102.4</span></span>
+<span><span class="co">#&gt;  8 Washoe County     2023      64990 100</span></span>
+<span><span class="co">#&gt;  9 Washoe County     2024      64755  99.6</span></span>
+<span><span class="co">#&gt; 10 Washoe County     2026      63655  97.9</span></span></code></pre></div>
+<div class="float">
+<img src="https://almartin82.github.io/nvschooldata/articles/enrollment_hooks_files/figure-html/growth-chart-1.png" alt="Clark vs Washoe enrollment trends"><div class="figcaption">Clark vs Washoe enrollment trends</div>
+</div>
+<p><a href="https://almartin82.github.io/nvschooldata/articles/enrollment_hooks.html#clark-county-lost-27706-students-since-2021-while-washoe-held-steady">(source)</a></p>
+<hr>
+</div>
+<div class="section level3">
+<h3 id="id_6-hispanic-students-are-46-of-nevada-enrollment-down-slightly-from-47-in-2021">6. Hispanic students are 46% of Nevada enrollment, down slightly from 47% in 2021<a class="anchor" aria-label="anchor" href="#id_6-hispanic-students-are-46-of-nevada-enrollment-down-slightly-from-47-in-2021"></a>
+</h3>
+<p>Hispanic students are the largest demographic group in Nevada public schools at 45.9%, followed by white students at 25.9%. Hispanic share dipped from 46.8% in 2021 to 45.9% in 2026, a modest decrease even as Hispanic students remain the largest group.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">demographics</span> <span class="op">&lt;-</span> <span class="va">enr_2026</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span>,</span>
+<span>         <span class="va">subgroup</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"white"</span>, <span class="st">"black"</span>, <span class="st">"hispanic"</span>, <span class="st">"asian"</span>,</span>
+<span>                         <span class="st">"native_american"</span>, <span class="st">"multiracial"</span>, <span class="st">"pacific_islander"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">subgroup</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span>n_students <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">n_students</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, .groups <span class="op">=</span> <span class="st">"drop"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>pct <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">n_students</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">n_students</span><span class="op">)</span> <span class="op">*</span> <span class="fl">100</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">desc</a></span><span class="op">(</span><span class="va">n_students</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">demographics</span><span class="op">)</span> <span class="op">==</span> <span class="fl">7</span><span class="op">)</span></span>
+<span><span class="va">demographics</span></span>
+<span><span class="co">#&gt; # A tibble: 7 x 3</span></span>
+<span><span class="co">#&gt;   subgroup         n_students   pct</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;                 &lt;dbl&gt; &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 hispanic             217320  45.9</span></span>
+<span><span class="co">#&gt; 2 white                122852  25.9</span></span>
+<span><span class="co">#&gt; 3 black                 58830  12.4</span></span>
+<span><span class="co">#&gt; 4 multiracial           37516   7.9</span></span>
+<span><span class="co">#&gt; 5 asian                 27170   5.7</span></span>
+<span><span class="co">#&gt; 6 pacific_islander       6622   1.4</span></span>
+<span><span class="co">#&gt; 7 native_american        3347   0.7</span></span></code></pre></div>
+<div class="float">
+<img src="https://almartin82.github.io/nvschooldata/articles/enrollment_hooks_files/figure-html/demographics-chart-1.png" alt="Nevada student demographics"><div class="figcaption">Nevada student demographics</div>
+</div>
+<p><a href="https://almartin82.github.io/nvschooldata/articles/enrollment_hooks.html#hispanic-students-are-46-of-nevada-enrollment-down-slightly-from-47-in-2021">(source)</a></p>
+<hr>
+</div>
+<div class="section level3">
+<h3 id="id_7-las-vegas-metro-has-616-of-all-nevada-students">7. Las Vegas Metro has 61.6% of all Nevada students<a class="anchor" aria-label="anchor" href="#id_7-las-vegas-metro-has-616-of-all-nevada-students"></a>
+</h3>
+<p>Beyond Las Vegas and Reno, the remaining 68 entities (15 rural county districts plus charter schools) account for 25% of enrollment.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">regional</span> <span class="op">&lt;-</span> <span class="va">enr_2026</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"total_enrollment"</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>region <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"Clark"</span>, <span class="va">district_name</span><span class="op">)</span> <span class="op">~</span> <span class="st">"Las Vegas Metro"</span>,</span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"Washoe"</span>, <span class="va">district_name</span><span class="op">)</span> <span class="op">~</span> <span class="st">"Reno Metro"</span>,</span>
+<span>    <span class="cn">TRUE</span> <span class="op">~</span> <span class="st">"Rest of Nevada"</span></span>
+<span>  <span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">region</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span></span>
+<span>    n_entities <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/n_distinct.html" class="external-link">n_distinct</a></span><span class="op">(</span><span class="va">district_name</span><span class="op">)</span>,</span>
+<span>    total_enrollment <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">n_students</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>    .groups <span class="op">=</span> <span class="st">"drop"</span></span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>pct <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">total_enrollment</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">total_enrollment</span><span class="op">)</span> <span class="op">*</span> <span class="fl">100</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">regional</span><span class="op">)</span> <span class="op">==</span> <span class="fl">3</span><span class="op">)</span></span>
+<span><span class="va">regional</span></span>
+<span><span class="co">#&gt; # A tibble: 3 x 4</span></span>
+<span><span class="co">#&gt;   region          n_entities total_enrollment   pct</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;                &lt;int&gt;            &lt;dbl&gt; &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 Las Vegas Metro          1           291587  61.6</span></span>
+<span><span class="co">#&gt; 2 Reno Metro               1            63655  13.4</span></span>
+<span><span class="co">#&gt; 3 Rest of Nevada          68           118415  25.0</span></span></code></pre></div>
+<div class="float">
+<img src="https://almartin82.github.io/nvschooldata/articles/enrollment_hooks_files/figure-html/regional-chart-1.png" alt="Enrollment by region"><div class="figcaption">Enrollment by region</div>
+</div>
+<p><a href="https://almartin82.github.io/nvschooldata/articles/enrollment_hooks.html#las-vegas-metro-has-61.6-of-all-nevada-students">(source)</a></p>
+<hr>
+</div>
+<div class="section level3">
+<h3 id="id_8-fifteen-districts-report-100-frl-eligibility">8. Fifteen districts report 100% FRL eligibility<a class="anchor" aria-label="anchor" href="#id_8-fifteen-districts-report-100-frl-eligibility"></a>
+</h3>
+<p>FRL eligibility is a proxy for economic disadvantage. Many charter schools report 100% FRL, along with two rural counties (Esmeralda and Pershing). The variation across districts is enormous.</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">frl_data</span> <span class="op">&lt;-</span> <span class="va">enr_2026</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"free_reduced_lunch"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>pct_display <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">pct</span> <span class="op">*</span> <span class="fl">100</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">desc</a></span><span class="op">(</span><span class="va">pct</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">15</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">district_name</span>, <span class="va">n_students</span>, <span class="va">pct_display</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">frl_data</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span></span>
+<span><span class="va">frl_data</span></span>
+<span><span class="co">#&gt; # A tibble: 15 x 3</span></span>
+<span><span class="co">#&gt;    district_name                           n_students pct_display</span></span>
+<span><span class="co">#&gt;    &lt;chr&gt;                                        &lt;dbl&gt;       &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt;  1 Esmeralda County School District                69       100</span></span>
+<span><span class="co">#&gt;  2 Pershing County School District                647       100</span></span>
+<span><span class="co">#&gt;  3 Futuro Academy                                 484       100</span></span>
+<span><span class="co">#&gt;  4 Mater Academy of Northern Nevada               514       100</span></span>
+<span><span class="co">#&gt;  5 Democracy Prep                                 927       100</span></span>
+<span><span class="co">#&gt;  6 Sports Leadership and Management Academy      1988       100</span></span>
+<span><span class="co">#&gt;  7 Equipo Academy                                 949       100</span></span>
+<span><span class="co">#&gt;  8 Mater Academy of Nevada                       5297       100</span></span>
+<span><span class="co">#&gt;  9 Rainbow Dreams Early Learning Academy          229       100</span></span>
+<span><span class="co">#&gt; 10 The Delta Academy                             1315       100</span></span>
+<span><span class="co">#&gt; 11 Innovations International Charter School       619       100</span></span>
+<span><span class="co">#&gt; 12 Quest Academy                                  415       100</span></span>
+<span><span class="co">#&gt; 13 FuturEdge Academy                              318       100</span></span>
+<span><span class="co">#&gt; 14 Southern Nevada Trades High School             250       100</span></span>
+<span><span class="co">#&gt; 15 Vegas Vista Academy                            270       100</span></span></code></pre></div>
+<div class="float">
+<img src="https://almartin82.github.io/nvschooldata/articles/enrollment_hooks_files/figure-html/frl-chart-1.png" alt="FRL eligibility by district"><div class="figcaption">FRL eligibility by district</div>
+</div>
+<p><a href="https://almartin82.github.io/nvschooldata/articles/enrollment_hooks.html#fifteen-districts-report-100-frl-eligibility">(source)</a></p>
+<hr>
+</div>
+<div class="section level3">
+<h3 id="id_9-futuro-academy-has-the-highest-el-concentration-at-41">9. Futuro Academy has the highest EL concentration at 41%<a class="anchor" aria-label="anchor" href="#id_9-futuro-academy-has-the-highest-el-concentration-at-41"></a>
+</h3>
+<p>English Learner populations vary dramatically. Clark County leads in absolute numbers (45,993), but several charter schools have much higher EL concentrations. Futuro Academy leads at 41.1% EL students, followed by Equipo Academy at 38.5%.</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">el_data</span> <span class="op">&lt;-</span> <span class="va">enr_2026</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"lep"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">desc</a></span><span class="op">(</span><span class="va">n_students</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">district_name</span>, <span class="va">n_students</span>, <span class="va">pct</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">el_data</span><span class="op">)</span> <span class="op">==</span> <span class="fl">10</span><span class="op">)</span></span>
+<span><span class="va">el_data</span></span>
+<span><span class="co">#&gt; # A tibble: 10 x 3</span></span>
+<span><span class="co">#&gt;    district_name                      n_students    pct</span></span>
+<span><span class="co">#&gt;    &lt;chr&gt;                                   &lt;dbl&gt;  &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt;  1 Clark County School District            45993 0.158</span></span>
+<span><span class="co">#&gt;  2 Washoe County School District            9229 0.145</span></span>
+<span><span class="co">#&gt;  3 Mater Academy of Nevada                  1816 0.343</span></span>
+<span><span class="co">#&gt;  4 Carson City School District               916 0.126</span></span>
+<span><span class="co">#&gt;  5 Elko County School District               774 0.083</span></span>
+<span><span class="co">#&gt;  6 Lyon County School District               637 0.070</span></span>
+<span><span class="co">#&gt;  7 Nye County School District                449 0.077</span></span>
+<span><span class="co">#&gt;  8 Somerset Academy of Las Vegas             405 0.042</span></span>
+<span><span class="co">#&gt;  9 CIVICA Academy                            403 0.280</span></span>
+<span><span class="co">#&gt; 10 Equipo Academy                            365 0.385</span></span></code></pre></div>
+<div class="float">
+<img src="https://almartin82.github.io/nvschooldata/articles/enrollment_hooks_files/figure-html/el-chart-1.png" alt="English Learner enrollment by district"><div class="figcaption">English Learner enrollment by district</div>
+</div>
+<p><a href="https://almartin82.github.io/nvschooldata/articles/enrollment_hooks.html#futuro-academy-has-the-highest-el-concentration-at-41">(source)</a></p>
+<hr>
+</div>
+<div class="section level3">
+<h3 id="id_10-clark-county-has-5x-more-el-students-than-washoe-but-similar-frl-rates">10. Clark County has 5x more EL students than Washoe but similar FRL rates<a class="anchor" aria-label="anchor" href="#id_10-clark-county-has-5x-more-el-students-than-washoe-but-similar-frl-rates"></a>
+</h3>
+<p>English Learners, students with IEPs, and Free/Reduced Lunch eligible students represent key populations for educational policy. Clark County has ~46,000 EL students vs Washoe’s ~9,200.</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">special_pops</span> <span class="op">&lt;-</span> <span class="va">enr_2026</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span>,</span>
+<span>         <span class="va">subgroup</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"free_reduced_lunch"</span>, <span class="st">"special_ed"</span>, <span class="st">"lep"</span><span class="op">)</span>,</span>
+<span>         <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"Clark|Washoe"</span>, <span class="va">district_name</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>county <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"Clark"</span>, <span class="va">district_name</span><span class="op">)</span>, <span class="st">"Clark County"</span>, <span class="st">"Washoe County"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">county</span>, <span class="va">subgroup</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span>n_students <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">n_students</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, .groups <span class="op">=</span> <span class="st">"drop"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">special_pops</span><span class="op">)</span> <span class="op">==</span> <span class="fl">6</span><span class="op">)</span></span>
+<span><span class="va">special_pops</span></span>
+<span><span class="co">#&gt; # A tibble: 6 x 3</span></span>
+<span><span class="co">#&gt;   county        subgroup           n_students</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;         &lt;chr&gt;                   &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 Clark County  free_reduced_lunch     282969</span></span>
+<span><span class="co">#&gt; 2 Clark County  lep                     45993</span></span>
+<span><span class="co">#&gt; 3 Clark County  special_ed              44484</span></span>
+<span><span class="co">#&gt; 4 Washoe County free_reduced_lunch      39010</span></span>
+<span><span class="co">#&gt; 5 Washoe County lep                      9229</span></span>
+<span><span class="co">#&gt; 6 Washoe County special_ed              10537</span></span></code></pre></div>
+<div class="float">
+<img src="https://almartin82.github.io/nvschooldata/articles/enrollment_hooks_files/figure-html/special-pops-chart-1.png" alt="Special populations by district"><div class="figcaption">Special populations by district</div>
+</div>
+<p><a href="https://almartin82.github.io/nvschooldata/articles/enrollment_hooks.html#clark-county-has-5x-more-el-students-than-washoe-but-similar-frl-rates">(source)</a></p>
+<hr>
+</div>
+<div class="section level3">
+<h3 id="id_11-12th-grade-has-the-most-students-pk-has-the-fewest">11. 12th grade has the most students; PK has the fewest<a class="anchor" aria-label="anchor" href="#id_11-12th-grade-has-the-most-students-pk-has-the-fewest"></a>
+</h3>
+<p>Tracking enrollment by grade reveals a classic pattern: PK is small (13,852), enrollment jumps at K (30,490), and peaks at 12th grade (37,730). Grade-level data is available at the school level.</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">grade_data</span> <span class="op">&lt;-</span> <span class="va">enr_2026</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_school</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"total_enrollment"</span>,</span>
+<span>         <span class="op">!</span><span class="va">grade_level</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"TOTAL"</span>, <span class="st">"UG"</span>, <span class="st">"AD"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">grade_level</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span>n_students <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">n_students</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, .groups <span class="op">=</span> <span class="st">"drop"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>grade_level <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">grade_level</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"PK"</span>, <span class="st">"K"</span>, <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"%02d"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">12</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">grade_level</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">grade_data</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span></span>
+<span><span class="va">grade_data</span></span>
+<span><span class="co">#&gt; # A tibble: 14 x 2</span></span>
+<span><span class="co">#&gt;    grade_level n_students</span></span>
+<span><span class="co">#&gt;    &lt;fct&gt;            &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt;  1 PK               13852</span></span>
+<span><span class="co">#&gt;  2 K                30490</span></span>
+<span><span class="co">#&gt;  3 01               31486</span></span>
+<span><span class="co">#&gt;  4 02               30265</span></span>
+<span><span class="co">#&gt;  5 03               33417</span></span>
+<span><span class="co">#&gt;  6 04               35890</span></span>
+<span><span class="co">#&gt;  7 05               34847</span></span>
+<span><span class="co">#&gt;  8 06               35814</span></span>
+<span><span class="co">#&gt;  9 07               36276</span></span>
+<span><span class="co">#&gt; 10 08               36577</span></span>
+<span><span class="co">#&gt; 11 09               37251</span></span>
+<span><span class="co">#&gt; 12 10               37010</span></span>
+<span><span class="co">#&gt; 13 11               37217</span></span>
+<span><span class="co">#&gt; 14 12               37730</span></span></code></pre></div>
+<div class="float">
+<img src="https://almartin82.github.io/nvschooldata/articles/enrollment_hooks_files/figure-html/grade-chart-1.png" alt="Enrollment by grade level"><div class="figcaption">Enrollment by grade level</div>
+</div>
+<p><a href="https://almartin82.github.io/nvschooldata/articles/enrollment_hooks.html#th-grade-has-the-most-students-pk-has-the-fewest">(source)</a></p>
+<hr>
+</div>
+<div class="section level3">
+<h3 id="id_12-nevadas-smallest-leas-are-charter-schools-not-counties">12. Nevada’s smallest LEAs are charter schools, not counties<a class="anchor" aria-label="anchor" href="#id_12-nevadas-smallest-leas-are-charter-schools-not-counties"></a>
+</h3>
+<p>While Esmeralda County (69 students) is the smallest county district, Nevada’s smallest LEAs are micro-charters. Nevada State High School II has just 18 students.</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">smallest</span> <span class="op">&lt;-</span> <span class="va">enr_2026</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"total_enrollment"</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">n_students</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">district_name</span>, <span class="va">n_students</span>, <span class="va">is_charter</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">smallest</span><span class="op">)</span> <span class="op">==</span> <span class="fl">10</span><span class="op">)</span></span>
+<span><span class="va">smallest</span></span>
+<span><span class="co">#&gt; # A tibble: 10 x 3</span></span>
+<span><span class="co">#&gt;    district_name                                  n_students is_charter</span></span>
+<span><span class="co">#&gt;    &lt;chr&gt;                                               &lt;dbl&gt; &lt;lgl&gt;</span></span>
+<span><span class="co">#&gt;  1 Nevada State High School II                            18 TRUE</span></span>
+<span><span class="co">#&gt;  2 Independence High School                               37 FALSE</span></span>
+<span><span class="co">#&gt;  3 Esmeralda County School District                       69 FALSE</span></span>
+<span><span class="co">#&gt;  4 Nevada Classical Academy Elko                          83 TRUE</span></span>
+<span><span class="co">#&gt;  5 Young Women's Leadership Academy of Las Vegas         108 TRUE</span></span>
+<span><span class="co">#&gt;  6 Learning Bridge                                       171 TRUE</span></span>
+<span><span class="co">#&gt;  7 Davidson Academy                                      171 FALSE</span></span>
+<span><span class="co">#&gt;  8 Do &amp; Be Arts Academy of Excellence                    175 TRUE</span></span>
+<span><span class="co">#&gt;  9 Silver Sands Montessori                               188 TRUE</span></span>
+<span><span class="co">#&gt; 10 Honors Academy of Literature                          202 TRUE</span></span></code></pre></div>
+<div class="float">
+<img src="https://almartin82.github.io/nvschooldata/articles/enrollment_hooks_files/figure-html/smallest-chart-1.png" alt="Nevada’s smallest districts"><div class="figcaption">Nevada’s smallest districts</div>
+</div>
+<p><a href="https://almartin82.github.io/nvschooldata/articles/enrollment_hooks.html#nevadas-smallest-leas-are-charter-schools-not-counties">(source)</a></p>
+<hr>
+</div>
+<div class="section level3">
+<h3 id="id_13-lyon-county-has-the-highest-iep-rate-among-large-districts-at-17">13. Lyon County has the highest IEP rate among large districts at 17%<a class="anchor" aria-label="anchor" href="#id_13-lyon-county-has-the-highest-iep-rate-among-large-districts-at-17"></a>
+</h3>
+<p>Students with IEPs require specialized services. Clark County has the most IEP students by count (44,484), but Lyon County has the highest rate among sizable districts at 17%.</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">iep_data</span> <span class="op">&lt;-</span> <span class="va">enr_2026</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"special_ed"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>pct_display <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">pct</span> <span class="op">*</span> <span class="fl">100</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">desc</a></span><span class="op">(</span><span class="va">n_students</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">district_name</span>, <span class="va">n_students</span>, <span class="va">pct_display</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">iep_data</span><span class="op">)</span> <span class="op">==</span> <span class="fl">10</span><span class="op">)</span></span>
+<span><span class="va">iep_data</span></span>
+<span><span class="co">#&gt; # A tibble: 10 x 3</span></span>
+<span><span class="co">#&gt;    district_name                  n_students pct_display</span></span>
+<span><span class="co">#&gt;    &lt;chr&gt;                               &lt;dbl&gt;       &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt;  1 Clark County School District        44484        15.3</span></span>
+<span><span class="co">#&gt;  2 Washoe County School District       10537        16.6</span></span>
+<span><span class="co">#&gt;  3 Lyon County School District          1541        17.0</span></span>
+<span><span class="co">#&gt;  4 Somerset Academy of Las Vegas        1258        13.2</span></span>
+<span><span class="co">#&gt;  5 Elko County School District          1238        13.3</span></span>
+<span><span class="co">#&gt;  6 Carson City School District           943        13.0</span></span>
+<span><span class="co">#&gt;  7 Nye County School District            882        15.2</span></span>
+<span><span class="co">#&gt;  8 Pinecrest Academy of Nevada           840         9.9</span></span>
+<span><span class="co">#&gt;  9 Douglas County School District        692        14.6</span></span>
+<span><span class="co">#&gt; 10 Doral Academy                         674        10.5</span></span></code></pre></div>
+<div class="float">
+<img src="https://almartin82.github.io/nvschooldata/articles/enrollment_hooks_files/figure-html/iep-chart-1.png" alt="IEP students by district"><div class="figcaption">IEP students by district</div>
+</div>
+<p><a href="https://almartin82.github.io/nvschooldata/articles/enrollment_hooks.html#lyon-county-has-the-highest-iep-rate-among-large-districts-at-17">(source)</a></p>
+<hr>
+</div>
+<div class="section level3">
+<h3 id="id_14-washoe-county-lost-1333-students-over-5-years">14. Washoe County lost 1,333 students over 5 years<a class="anchor" aria-label="anchor" href="#id_14-washoe-county-lost-1333-students-over-5-years"></a>
+</h3>
+<p>Washoe County (Reno-Sparks) is Nevada’s second-largest district. It peaked at 66,541 in 2022 before declining.</p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">washoe_data</span> <span class="op">&lt;-</span> <span class="va">enr</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">subgroup</span> <span class="op">==</span> <span class="st">"total_enrollment"</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span>,</span>
+<span>         <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"Washoe"</span>, <span class="va">district_name</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">end_year</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span>n_students <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">n_students</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, .groups <span class="op">=</span> <span class="st">"drop"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>change <span class="op">=</span> <span class="va">n_students</span> <span class="op">-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/lead-lag.html" class="external-link">lag</a></span><span class="op">(</span><span class="va">n_students</span><span class="op">)</span>,</span>
+<span>         pct_change <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">change</span> <span class="op">/</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/lead-lag.html" class="external-link">lag</a></span><span class="op">(</span><span class="va">n_students</span><span class="op">)</span> <span class="op">*</span> <span class="fl">100</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">washoe_data</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span><span class="op">)</span></span>
+<span><span class="va">washoe_data</span></span>
+<span><span class="co">#&gt; # A tibble: 5 x 4</span></span>
+<span><span class="co">#&gt;   end_year n_students change pct_change</span></span>
+<span><span class="co">#&gt;      &lt;dbl&gt;      &lt;dbl&gt;  &lt;dbl&gt;      &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1     2021      64988     NA      NA</span></span>
+<span><span class="co">#&gt; 2     2022      66541   1553       2.39</span></span>
+<span><span class="co">#&gt; 3     2023      64990  -1551      -2.33</span></span>
+<span><span class="co">#&gt; 4     2024      64755   -235      -0.36</span></span>
+<span><span class="co">#&gt; 5     2026      63655  -1100      -1.70</span></span></code></pre></div>
+<div class="float">
+<img src="https://almartin82.github.io/nvschooldata/articles/enrollment_hooks_files/figure-html/washoe-chart-1.png" alt="Washoe County enrollment"><div class="figcaption">Washoe County enrollment</div>
+</div>
+<p><a href="https://almartin82.github.io/nvschooldata/articles/enrollment_hooks.html#washoe-county-lost-1333-students-over-5-years">(source)</a></p>
+<hr>
+</div>
+<div class="section level3">
+<h3 id="id_15-boys-outnumber-girls-513-to-487-statewide">15. Boys outnumber girls 51.3% to 48.7% statewide<a class="anchor" aria-label="anchor" href="#id_15-boys-outnumber-girls-513-to-487-statewide"></a>
+</h3>
+<p>The gender split across Nevada schools is close to even, with a slight male skew consistent with national patterns.</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">gender_data</span> <span class="op">&lt;-</span> <span class="va">enr_2026</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">is_district</span>, <span class="va">grade_level</span> <span class="op">==</span> <span class="st">"TOTAL"</span>,</span>
+<span>         <span class="va">subgroup</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"male"</span>, <span class="st">"female"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">subgroup</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span>n_students <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">n_students</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, .groups <span class="op">=</span> <span class="st">"drop"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>pct <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">n_students</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="va">n_students</span><span class="op">)</span> <span class="op">*</span> <span class="fl">100</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">gender_data</span><span class="op">)</span> <span class="op">==</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="va">gender_data</span></span>
+<span><span class="co">#&gt; # A tibble: 2 x 3</span></span>
+<span><span class="co">#&gt;   subgroup n_students   pct</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;         &lt;dbl&gt; &lt;dbl&gt;</span></span>
+<span><span class="co">#&gt; 1 female       230511  48.7</span></span>
+<span><span class="co">#&gt; 2 male         243022  51.3</span></span></code></pre></div>
+<div class="float">
+<img src="https://almartin82.github.io/nvschooldata/articles/enrollment_hooks_files/figure-html/gender-chart-1.png" alt="Enrollment by gender"><div class="figcaption">Enrollment by gender</div>
+</div>
+<p><a href="https://almartin82.github.io/nvschooldata/articles/enrollment_hooks.html#boys-outnumber-girls-51.3-to-48.7-statewide">(source)</a></p>
+</div>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
